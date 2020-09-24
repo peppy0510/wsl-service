@@ -1,6 +1,6 @@
 # WSL Service
 
-* Helps WSL(Windows Subsystem for Linux) startup on you Windows boot.
+* Helps WSL(Windows Subsystem for Linux) startup on your Windows boot.
 * Automatically configure your Windows and WSL's static ip address, firewall, proxy ports.
 * WSL Service will startup and executes init commands your WSL without Windows logon.
 * You can run web server like as linux daemon with init commands.
