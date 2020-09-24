@@ -1,7 +1,11 @@
 {
+    "DISTRIBUTION": "Ubuntu-20.04",
+    "BINDING_ADDRESS": "192.168.100.1",
+    "VETHERNET_ADDRESS": "192.168.100.2",
     "PROXY_FORWARDING_PORTS": [
         // SSH
-        22, 23,
+        22,
+        23,
         // SMTP
         587,
         // MySQL, MariaDB
@@ -11,22 +15,27 @@
         // HAProxy
         9000,
         // RabbitMQ
-        5672, 15672, 25672,
+        5672,
+        15672,
+        25672,
         // Elasticsearch
-        5601, 6443, 9100, 9200, 9300,
+        5601,
+        6443,
+        9100,
+        9200,
+        9300,
         // SMB
-        139, 445,
+        139,
+        445,
         // NFS
-        111, 2049,
+        111,
+        2049,
         // ChromeDev
         9222
     ],
     // If you want to seperate ports with proxy.
     // If you want to forward directly with reverse proxy web server on windows such as Apache, Caddy, Nginx, ...
-    "FIREWALL_ALLOWED_PORTS": [
-        80, 443,
-        8000, 8080, 8443
-    ],
-    "INITD_SERVICES": ["ssh", "mysql", "redis-server"]
+    "FIREWALL_ALLOWED_PORTS": [80, 443, 8000, 8080, 8443],
+    "INITD_SERVICES": ["ssh", "mysql", "redis-server"],
     "INITD_EXECUTES": []
 }

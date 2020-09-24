@@ -13,6 +13,7 @@ import subprocess
 from libbase import execute
 from settings import BASH_EXECUTABLE
 from settings import CWD
+from settings import BINDING_ADDRESS
 
 
 class portproxy:
@@ -69,7 +70,7 @@ class portproxy:
 
     @classmethod
     def get_wsl_ipaddress(self):
-        return '192.168.100.2'
+        return BINDING_ADDRESS
 
         command = [BASH_EXECUTABLE, '-c', 'ip addr show eth0 | grep "inet\\b" | awk "{print $2}" | cut -d/ -f1']
         proc = subprocess.Popen(

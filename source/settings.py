@@ -13,7 +13,6 @@ from libjson import load_commented_json
 from libjson import merge_dict
 from pathlib import Path
 
-DISTRIBUTION = 'Ubuntu-20.04'
 
 FIREWALL_RULE_NAME = '+WSL'
 
@@ -28,6 +27,14 @@ settings = load_commented_json(str(default_path))
 if user_path.exists():
     user_settings = load_commented_json(str(user_path))
     settings = merge_dict(settings, user_settings)
+
+DISTRIBUTION = settings.get('DISTRIBUTION', 'Ubuntu-20.04')
+
+BINDING_ADDRESS = settings.get('BINDING_ADDRESS', '192.168.100.1').strip()
+VETHERNET_ADDRESS = settings.get('VETHERNET_ADDRESS', '192.168.100.2').strip()
+__address_parts = BINDING_ADDRESS.split('.')
+__address_parts[-1] = '255'
+BROADCAST_ADDRESS = '.'.join(__address_parts)
 
 INITD_SERVICES = settings.get('INITD_SERVICES', [])
 INITD_EXECUTES = settings.get('INITD_EXECUTES', [])

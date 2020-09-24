@@ -22,34 +22,15 @@ from libportproxy import portproxy
 from libuaccontrol import run_as_admin
 from settings import ANSI_BACKGROUND_WHITE
 from settings import ANSI_RESET
+from settings import BINDING_ADDRESS
+from settings import BROADCAST_ADDRESS
 from settings import DISTRIBUTION
 from settings import FIREWALL_ALLOWED_PORTS
 from settings import INITD_EXECUTES
 from settings import INITD_SERVICES
 from settings import PROXY_FORWARDING_PORTS
+from settings import VETHERNET_ADDRESS
 from settings import WSL_EXECUTABLE
-# DISTRIBUTION = 'Ubuntu-20.04'
-
-# FIREWALL_RULE_NAME = '+WSL'
-
-# WSL_EXECUTABLE = str(Path('C:/Windows/System32/wsl.exe'))
-# BASH_EXECUTABLE = str(Path('C:/Windows/System32/bash.exe'))
-
-# settings = load_commented_json('settings.json')
-
-# INITD_SERVICES = settings.get('INITD_SERVICES')
-# INITD_EXECUTES = settings.get('INITD_EXECUTES')
-
-# PROXY_FORWARDING_PORTS = settings.get('PROXY_FORWARDING_PORTS')
-# FIREWALL_ALLOWED_PORTS = settings.get('FIREWALL_ALLOWED_PORTS')
-# FIREWALL_ALLOWED_PORTS = sorted(list(set(FIREWALL_ALLOWED_PORTS + PROXY_FORWARDING_PORTS)))
-
-# CWD = os.path.expanduser('~')
-
-# DELEGATE_EXEC_REG_KEY = 'DelegateExecute'
-
-# ANSI_BACKGROUND_WHITE = '\x1b[7m'
-# ANSI_RESET = '\x1b[0m'
 
 
 class AppServerSvc(win32serviceutil.ServiceFramework):
@@ -84,9 +65,14 @@ def main():
     advfirewall.remove()
 
     execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} -u root '
-             'ip addr add 192.168.100.2/24 broadcast 192.168.100.255 '
+             f'ip addr del {BINDING_ADDRESS}/24'
              'dev eth0 label eth0:1'), display_error=False)
-    execute('netsh interface ip add address "vEthernet (WSL)" 192.168.100.3 255.255.255.0')
+
+    execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} -u root '
+             f'ip addr add {BINDING_ADDRESS}/24 broadcast {BROADCAST_ADDRESS} '
+             'dev eth0 label eth0:1'), display_error=False)
+
+    execute(f'netsh interface ip add address "vEthernet (WSL)" {VETHERNET_ADDRESS} 255.255.255.0')
 
     print()
 
@@ -99,6 +85,7 @@ def main():
     initd.service(INITD_SERVICES)
     print()
     initd.execute(INITD_EXECUTES)
+
     # print(' * WSL Service Initialization SUCCESS')
     print(' ' + ' WSL INITIALIZATION SUCCESS '.join([ANSI_BACKGROUND_WHITE, ANSI_RESET]))
     print()
