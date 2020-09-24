@@ -3,10 +3,12 @@
 Helps WSL(Windows Subsystem for Linux) startup on you Windows boot.
 You can configure with `settings.json` file.
 
+* `BINDING_ADDRESS`: Static Local IP Address for your WSL
 * `FIREWALL_ALLOWED_PORTS`: Automatic registeration on Windows firewall allowed port
 * `PROXY_FORWARDING_PORTS`: Automatic registeration on Windows proxy port forwarding
 * `INITD_SERVICES`: Automatically executes startup services such as ssh, nginx, mysql, redis, ...
-* `INITD_EXECUTES`: Automatically executes additional commands on startup such as your own server.
+* `INITD_EXECUTES`: Automatically executes additional commands on startup such as your own server
+* WSL Service will startup and executes init commands your WSL without Windows logon thus you could run web server like as real linux daemon.
 
 ## How to register as Windows Service
 
