@@ -23,7 +23,7 @@ from settings import DISTRIBUTION
 from settings import FIREWALL_ALLOWED_PORTS
 from settings import INITD_EXECUTES
 from settings import INITD_SERVICES
-from settings import PROXY_FORWARDING_PORTS
+from settings import PROXY_FORWARDING_TCP_PORTS
 from settings import VETHERNET_ADDRESS
 from settings import WSL_EXECUTABLE
 
@@ -45,7 +45,7 @@ def main():
 
     print()
 
-    portproxy.add(PROXY_FORWARDING_PORTS)
+    portproxy.add(PROXY_FORWARDING_TCP_PORTS)
     portproxy.showall()
 
     advfirewall.add(FIREWALL_ALLOWED_PORTS)
