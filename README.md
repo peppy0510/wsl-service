@@ -63,7 +63,7 @@ Default settings fie is `wsl-service/source/settings.json`. Copy to `wsl-service
 
 * `BINDING_ADDRESS`: Static local ip address for your WSL.
 * `FIREWALL_ALLOWED_PORTS`: Automatic registeration on Windows firewall allowed port.
-* `PROXY_FORWARDING_PORTS`: Automatic registeration on Windows proxy port forwarding.
+* `PROXY_FORWARDING_TCP_PORTS`: Automatic registeration on Windows proxy port forwarding.
 * `INITD_SERVICES`: Automatically executes startup services such as ssh, nginx, mysql, redis, ...
 * `INITD_EXECUTES`: Automatically executes additional commands on startup such as your own server.
 
