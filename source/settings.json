@@ -30,14 +30,19 @@
         // NFS
         111,
         2049,
+        // Cassandra
+        9042,
         // ChromeDev
-        9222
+        9222,
+        // SeaweedFS
+        9333
     ],
     "PROXY_FORWARDING_UDP_PORTS": [],
     "SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS": [],
     // If you want to seperate ports with proxy.
     // If you want to forward directly with reverse proxy web server on windows such as Apache, Caddy, Nginx, ...
     "FIREWALL_ALLOWED_PORTS": [80, 443, 8000, 8080, 8443],
-    "INITD_SERVICES": ["ssh", "mysql", "redis-server"],
+    // "INITD_SERVICES": ["ssh", "mysql", "redis-server"],
+    "INITD_SERVICES": [],
     "INITD_EXECUTES": []
 }

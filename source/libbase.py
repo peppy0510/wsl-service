@@ -7,7 +7,9 @@ email: peppy0510@hotmail.com
 '''
 
 
+import asyncio
 import subprocess
+import time
 
 from settings import CWD
 from settings import DISTRIBUTION
@@ -47,6 +49,28 @@ def execute(command, shell=False, display_error=True):
 
     try:
         resp, error = proc.communicate()
+    except IndexError:
+        pass
+    except UnicodeDecodeError:
+        pass
+
+    if display_error and error and isinstance(error, str):
+        print(error)
+
+    return resp
+
+
+async def aioexecute(command, shell=False, display_error=True):
+
+    proc = await asyncio.create_subprocess_exec(
+        *command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=False, shell=shell, cwd=CWD)
+
+    resp = None
+    error = None
+
+    try:
+        resp, error = await proc.communicate()
+        # resp, error = await asyncio.wait_for(proc.communicate(), timeout=10)
     except IndexError:
         pass
     except UnicodeDecodeError:

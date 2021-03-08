@@ -7,6 +7,7 @@ email: peppy0510@hotmail.com
 '''
 
 
+import asyncio
 import time
 
 from libadvfirewall import advfirewall
@@ -28,7 +29,7 @@ from settings import VETHERNET_ADDRESS
 from settings import WSL_EXECUTABLE
 
 
-def main():
+async def aiomain():
     shutdown()
     portproxy.reset()
     advfirewall.remove()
@@ -51,13 +52,21 @@ def main():
     advfirewall.add(FIREWALL_ALLOWED_PORTS)
     advfirewall.showall()
 
-    initd.service(INITD_SERVICES)
+    print()
+    await initd.systemd(INITD_SERVICES)
+    # await initd.service(INITD_SERVICES)
     print()
     initd.execute(INITD_EXECUTES)
     print() if INITD_EXECUTES else None
     print(' ' + ' WSL INITIALIZATION SUCCESS '.join([ANSI_BACKGROUND_WHITE, ANSI_RESET]))
     print()
     time.sleep(1)
+
+
+def main():
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(aiomain())
+    loop.close()
 
 
 if __name__ == '__main__':
