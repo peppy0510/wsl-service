@@ -27,6 +27,10 @@ SYSTEMD_EXCLUDES = [
     'xrdp',
 ]
 
+SERVICES_INCLUDES = [
+    'redis-server',
+]
+
 
 class initd:
 
@@ -35,18 +39,24 @@ class initd:
         resp = execute([BASH_EXECUTABLE, 'service', '--status-all'], display_error=False)
         lines = [v.strip() for v in resp.split('\n')]
         lines = [v for v in lines if v]
-        services = []
+
+        services = SERVICES_INCLUDES
+
         for line in lines:
             matched = re.match(r'^\[\s([\+\-\?])\s\][\s]{1,}([a-zA-Z\.]{1,})$', line)
             if matched:
                 name = matched.group(2)
                 services += [name]
 
+        services = sorted(list(set(services)))
+
         systemds = []
+
         for root in ['/etc/systemd/system', '/etc/systemd/system/multi-user.target.wants']:
             for path in sorted(Path(f'\\\\wsl$\\{DISTRIBUTION}').joinpath(root).glob('*.service')):
                 if path.is_file():
                     systemds += [path.stem]
+
         systemds = sorted(list(set(systemds)))
 
         for i in range(len(services) - 1, -1, -1):
@@ -56,6 +66,7 @@ class initd:
             if services[i] in SYSTEMD_EXCLUDES:
                 services.pop(i)
                 continue
+
         return services
 
     @classmethod
