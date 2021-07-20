@@ -70,7 +70,7 @@ class initd:
         return services
 
     @classmethod
-    async def systemd(self, services=[], concurrent=False):
+    async def systemd(self, services=[], concurrent=True):
         services += self.get_systemd_services()
         services = sorted(list(set(services)))
         await self.service(services, concurrent=concurrent)

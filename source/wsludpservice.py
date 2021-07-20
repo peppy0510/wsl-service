@@ -17,8 +17,13 @@ from settings import SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS
 
 
 class WSLUDPService(threading.Thread):
-
-    def __init__(self, src_host='0.0.0.0', dst_host=BINDING_ADDRESS, port=50002, insert_source=False):
+    def __init__(
+        self,
+        src_host='0.0.0.0',
+        dst_host=BINDING_ADDRESS,
+        port=50002,
+        insert_source=False,
+    ):
         self.port = port
         self.src_host = src_host
         self.dst_host = dst_host
@@ -33,9 +38,10 @@ class WSLUDPService(threading.Thread):
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as src_sock:
                 src_sock.bind((self.src_host, self.port))
                 while True:
-                    data, (src_host, port) = src_sock.recvfrom(8192)
+                    # data, (src_host, port) = src_sock.recvfrom(8192)
+                    data, (src_host, port) = src_sock.recvfrom(4096)
 
-                    # print((src_host, port))
+                    print((src_host, port,), data)
 
                     if src_host == self.dst_host:
                         continue
@@ -47,10 +53,14 @@ class WSLUDPService(threading.Thread):
 
 
 async def aiomain():
-    [WSLUDPService(port=port, insert_source=False).start()
-     for port in PROXY_FORWARDING_UDP_PORTS]
-    [WSLUDPService(port=port, insert_source=True).start()
-     for port in SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS]
+    [
+        WSLUDPService(port=port, insert_source=False).start()
+        for port in PROXY_FORWARDING_UDP_PORTS
+    ]
+    [
+        WSLUDPService(port=port, insert_source=True).start()
+        for port in SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS
+    ]
 
     while True:
         await asyncio.sleep(0.1)

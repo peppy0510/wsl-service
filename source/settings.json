@@ -35,9 +35,26 @@
         // ChromeDev
         9222,
         // SeaweedFS
-        9333
+        9333,
+        // jitsi
+        4443,
+        // jitsi turnserver
+        5349,
+        // HTTP HTTPS WebService
+        80,
+        443,
+        8000,
+        8080,
+        8443
     ],
-    "PROXY_FORWARDING_UDP_PORTS": [],
+    "PROXY_FORWARDING_UDP_PORTS": [
+        // jitsi turnserver
+        3478,
+        // jitsi coturn
+        5000,
+        // jitsi
+        10000
+    ],
     "SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS": [],
     // If you want to seperate ports with proxy.
     // If you want to forward directly with reverse proxy web server on windows such as Apache, Caddy, Nginx, ...
