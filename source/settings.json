@@ -3,6 +3,8 @@
     "BINDING_ADDRESS": "192.168.100.1",
     "VETHERNET_ADDRESS": "192.168.100.2",
     "PROXY_FORWARDING_TCP_PORTS": [
+        // FTP
+        21,
         // SSH
         22,
         23,
@@ -45,13 +47,18 @@
         443,
         8000,
         8080,
-        8443
+        8443,
+        // IONIC
+        8100,
+        // React Native
+        19000,
+        19001
     ],
     "PROXY_FORWARDING_UDP_PORTS": [
         // jitsi turnserver
         3478,
         // jitsi coturn
-        5000,
+        // 5000,
         // jitsi
         10000
     ],
