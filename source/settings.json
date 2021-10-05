@@ -51,8 +51,16 @@
         // IONIC
         8100,
         // React Native
+        // 5037,
+        8081,
+        // React Native EXPO
         19000,
-        19001
+        19001,
+        19002,
+        19003,
+        19004,
+        19005,
+        19006
     ],
     "PROXY_FORWARDING_UDP_PORTS": [
         // jitsi turnserver
@@ -65,7 +73,7 @@
     "SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS": [],
     // If you want to seperate ports with proxy.
     // If you want to forward directly with reverse proxy web server on windows such as Apache, Caddy, Nginx, ...
-    "FIREWALL_ALLOWED_PORTS": [80, 443, 8000, 8080, 8443],
+    "FIREWALL_ALLOWED_PORTS": [80, 443, 8000, 8080, 8443, 5037],
     // "INITD_SERVICES": ["ssh", "mysql", "redis-server"],
     "INITD_SERVICES": [],
     "INITD_EXECUTES": []

@@ -9,7 +9,6 @@ email: peppy0510@hotmail.com
 
 import asyncio
 import subprocess
-import time
 
 from settings import CWD
 from settings import DISTRIBUTION
@@ -36,13 +35,18 @@ def decode(string):
     return resp
 
 
-def shutdown():
+def terminate():
     execute(f'{WSL_EXECUTABLE} -t {DISTRIBUTION}', shell=True)
 
 
-def execute(command, shell=False, display_error=True):
+def shutdown():
+    execute(f'{WSL_EXECUTABLE} -d {DISTRIBUTION} --shutdown', shell=True)
+
+
+def execute(command, shell=False, display_error=True, close_fds=True):
     proc = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=shell, cwd=CWD)
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, shell=shell, cwd=CWD, close_fds=close_fds)
 
     resp = None
     error = None
@@ -60,10 +64,11 @@ def execute(command, shell=False, display_error=True):
     return resp
 
 
-async def aioexecute(command, shell=False, display_error=True):
+async def aioexecute(command, shell=False, display_error=True, close_fds=True):
 
     proc = await asyncio.create_subprocess_exec(
-        *command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=False, shell=shell, cwd=CWD)
+        *command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=False, shell=shell, cwd=CWD, close_fds=close_fds)
 
     resp = None
     error = None

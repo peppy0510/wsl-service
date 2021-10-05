@@ -16,6 +16,7 @@ from libbase import execute
 from pathlib import Path
 from settings import BASH_EXECUTABLE
 from settings import DISTRIBUTION
+from settings import WSL_EXECUTABLE
 
 SYSTEMD_EXCLUDES = [
     'acpid',
@@ -54,7 +55,9 @@ class initd:
 
         for root in ['/etc/systemd/system', '/etc/systemd/system/multi-user.target.wants']:
             for path in sorted(Path(f'\\\\wsl$\\{DISTRIBUTION}').joinpath(root).glob('*.service')):
-                if path.is_file():
+                # for path in sorted(Path(f'\\\\wsl.localhost\\{DISTRIBUTION}').joinpath(root).glob('*.service')):
+                # if path.is_file():
+                if not path.is_dir():
                     systemds += [path.stem]
 
         systemds = sorted(list(set(systemds)))
@@ -79,9 +82,12 @@ class initd:
     async def service(self, services, concurrent=True):
         if not services:
             return ''
-        prefix = 'sudo nohup service'
+
+        # prefix = 'sudo nohup service'
         # suffix = '>/dev/null 2>&1'
-        suffix = 'restart </dev/null >/dev/null 2>&1'
+        # suffix = 'restart </dev/null >/dev/null 2>&1'
+        prefix = 'service'
+        suffix = 'restart'
         _scripts = [f'{prefix} {v} {suffix}' for v in services]
 
         if concurrent:

@@ -31,7 +31,9 @@ from settings import WSL_EXECUTABLE
 
 async def aiomain():
     shutdown()
+
     portproxy.reset()
+
     advfirewall.remove()
 
     execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} -u root '
