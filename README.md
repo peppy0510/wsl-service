@@ -76,16 +76,25 @@
     ```bash
     taskschd.msc
     ```
+    
     ![](./assets/schtasks-install-step-00.png)
+    
     `Create New Task`
+    
     General Tab
+    
     ![](./assets/schtasks-install-step-01.png)
+    
     Triggers Tab
+    
     ![](./assets/schtasks-install-step-02.png)
     ![](./assets/schtasks-install-step-03.png)
+    
     Actions Tab
+    
     ![](./assets/schtasks-install-step-04.png)
     ![](./assets/schtasks-install-step-05.png)
+    
     Program/script: `nircmd`
     Add arguments: `elevatecmd exec hide "path/to/wsl-service/wslservice.bat"`
     Start in: `path/to/wsl-service`
