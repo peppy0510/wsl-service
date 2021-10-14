@@ -96,7 +96,9 @@
     ![](./assets/schtasks-install-step-05.png)
     
     Program/script: `nircmd`
+    
     Add arguments: `elevatecmd exec hide "path/to/wsl-service/wslservice.bat"`
+    
     Start in: `path/to/wsl-service`
     
 4. If you want to execute manually for a specific purpose, or to create shortcut icon, use `wslservicetask.bat` file which run task registered at scheduler.
