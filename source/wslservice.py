@@ -7,6 +7,7 @@ email: peppy0510@hotmail.com
 '''
 
 
+import argparse
 import asyncio
 import time
 
@@ -29,12 +30,33 @@ from settings import VETHERNET_ADDRESS
 from settings import WSL_EXECUTABLE
 
 
-async def aiomain():
-    shutdown()
+ENABLE_INITD = True
+ENABLE_NETWORK = True
 
-    portproxy.reset()
 
-    advfirewall.remove()
+parser = argparse.ArgumentParser(prog='python wslservice.py', add_help=True)
+
+parser.add_argument(
+    '-n',
+    '--network_only',
+    action='store_true',
+    help='network only',
+)
+
+parser.add_argument(
+    '-i',
+    '--initd_only',
+    action='store_true',
+    help='initd only',
+)
+
+args = parser.parse_args()
+
+ENABLE_INITD = False if args.network_only else ENABLE_INITD
+ENABLE_NETWORK = False if args.initd_only else ENABLE_NETWORK
+
+
+def setup_network_inside_wsl():
 
     execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} -u root '
              f'ip addr del {BINDING_ADDRESS}/24'
@@ -44,25 +66,43 @@ async def aiomain():
              f'ip addr add {BINDING_ADDRESS}/24 broadcast {BROADCAST_ADDRESS} '
              'dev eth0 label eth0:1'), display_error=False)
 
-    execute(f'netsh interface ip add address "vEthernet (WSL)" {VETHERNET_ADDRESS} 255.255.255.0')
 
-    print()
+async def aiomain():
 
-    portproxy.add(PROXY_FORWARDING_TCP_PORTS)
-    portproxy.showall()
+    if ENABLE_NETWORK:
+        shutdown()
+        portproxy.reset()
 
-    advfirewall.add(FIREWALL_ALLOWED_PORTS)
-    advfirewall.showall()
+        advfirewall.remove()
 
-    print()
-    await initd.systemd(INITD_SERVICES)
-    # await initd.service(INITD_SERVICES)
-    print()
-    initd.execute(INITD_EXECUTES)
-    print() if INITD_EXECUTES else None
-    print(' ' + ' WSL INITIALIZATION SUCCESS '.join([ANSI_BACKGROUND_WHITE, ANSI_RESET]))
-    print()
-    time.sleep(1)
+        setup_network_inside_wsl()
+
+        execute((f'netsh interface ip add address '
+                 f'"vEthernet (WSL)" {VETHERNET_ADDRESS} 255.255.255.0'))
+
+        print()
+
+        portproxy.add(PROXY_FORWARDING_TCP_PORTS)
+        portproxy.showall()
+
+        advfirewall.add(FIREWALL_ALLOWED_PORTS)
+        advfirewall.showall()
+
+    if ENABLE_INITD:
+        if not ENABLE_NETWORK:
+            shutdown()
+
+            setup_network_inside_wsl()
+
+        print()
+        await initd.systemd(INITD_SERVICES)
+        # await initd.service(INITD_SERVICES)
+        print()
+        initd.execute(INITD_EXECUTES)
+        print() if INITD_EXECUTES else None
+        print(' ' + ' WSL INITIALIZATION SUCCESS '.join([ANSI_BACKGROUND_WHITE, ANSI_RESET]))
+        print()
+        time.sleep(1)
 
 
 def main():
@@ -72,5 +112,8 @@ def main():
 
 
 if __name__ == '__main__':
-    run_as_admin(main)
+    if args.initd_only:
+        main()
+    else:
+        run_as_admin(main)
     # win32serviceutil.HandleCommandLine(AppServerSvc)

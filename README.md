@@ -9,17 +9,20 @@
 ## Requirements
 
 * Python 3 is required in your Windows.
-* Tested with Windows 10, Python 3.8, WSL2 Ubuntu-20.04
+* Tested with Windows 10~11, Python 3.8~3.9, WSL2 Ubuntu-20.04
 
 ## How to use
 
 * Download or clone this repository.
 * Execute `wslservice.bat`, to test if it works on your environment.
 * Follow next described step for automatic startup on Windows boot.
+* Register as **Windows Service** or **Task Scheduler**
 
 ## How to register as Windows Service
 
-#### To Install as Windows Service
+#### To Install as Windows Service (<u>Only for Windows 10</u>)
+
+* <u>Only works in Windows 10, has problem in Windows 11</u>, does not allow mounted WLS directory permission while accessing thru Windows 11 File Explorer.
 
 1. Install NSSM(Non-Sucking Service Manager). Download form [nssm.cc](https://nssm.cc/) and install or install with following command. Windows administrator privileges are required.
 
@@ -32,7 +35,6 @@
     ```bash
     nssm.exe install WSLService
     ```
-
     ![](./assets/nssm-install-step-01.png)
     ![](./assets/nssm-install-step-02.png)
     ![](./assets/nssm-install-step-03.png)
@@ -56,6 +58,39 @@
     ```bash
     nssm.exe remove WSLService
     ```
+
+## How to register as Task Scheduler
+
+#### To Install as Task Scheduler (<u>Recommended for windows 11</u>)
+
+* Resolves WLS directory permission problem while accessing thru Windows 11 File Explorer.
+
+2. Install [NirCmd](https://www.nirsoft.net/utils/nircmd.html). Download form [nirsoft.net](https://www.nirsoft.net/utils/nircmd.html) and install or install with following command. Windows administrator privileges are required.
+
+    ```bash
+    choco install nircmd
+    ```
+
+3. Create new task with `wslservice.bat` script at Task Scheduler.
+
+    ```bash
+    taskschd.msc
+    ```
+    ![](./assets/schtasks-install-step-00.png)
+    `Create New Task`
+    General Tab
+    ![](./assets/schtasks-install-step-01.png)
+    Triggers Tab
+    ![](./assets/schtasks-install-step-02.png)
+    ![](./assets/schtasks-install-step-03.png)
+    Actions Tab
+    ![](./assets/schtasks-install-step-04.png)
+    ![](./assets/schtasks-install-step-05.png)
+    Program/script: `nircmd`
+    Add arguments: `elevatecmd exec hide "path/to/wsl-service/wslservice.bat"`
+    Start in: `path/to/wsl-service`
+    
+4. If you want to execute manually for a specific purpose, or to create shortcut icon, use `wslservicetask.bat` file which run task registered at scheduler.
 
 ## Your own configuration
 
