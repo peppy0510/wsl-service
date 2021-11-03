@@ -14,5 +14,6 @@
 desktop.ini
 /log
 /venv
-# user settings
 /settings.json
+.sublime-workspace
+*.sublime-workspace
