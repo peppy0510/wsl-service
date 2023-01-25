@@ -9,7 +9,7 @@
 ## Requirements
 
 * Python 3 is required in your Windows.
-* Tested with Windows 10, Windows 11, Python 3.8, Python 3.9, WSL2 Ubuntu-20.04
+* Tested with Windows 10, Windows 11, Python 3.8, Python 3.9, Python 3.10, WSL2 Ubuntu-20.04, WSL2 Ubuntu-22.04
 
 ## How to use
 

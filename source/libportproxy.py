@@ -10,10 +10,13 @@ email: peppy0510@hotmail.com
 import re
 import subprocess
 
+from libbase import aioexecute
 from libbase import execute
 from settings import BASH_EXECUTABLE
 from settings import BINDING_ADDRESS
+from settings import BROADCAST_ADDRESS
 from settings import CWD
+from settings import WINDOWS_ADDRESS
 
 
 class portproxy:
@@ -63,10 +66,35 @@ class portproxy:
 
         self.reset()
         for port in sorted([ports] if isinstance(ports, int) else ports):
+            # execute((f'netcat {wsl_ipaddress} -l {port}'), shell=True)
+            # command = ['netcat', f'{wsl_ipaddress}', f'{port}', '-l']
+
             execute((
                 f'netsh interface portproxy add v4tov4 '
-                f'listenport={port} listenaddress=0.0.0.0 '
+                # f'listenport={port} listenaddress=0.0.0.0 '
+                f'listenport={port} listenaddress={WINDOWS_ADDRESS} '
                 f'connectport={port} connectaddress={wsl_ipaddress}'), shell=True)
+
+    @classmethod
+    async def aioadd(self, ports):
+        ports = sorted(ports)
+        ports = [ports] if isinstance(ports, int) else ports
+        ports = sorted(list(set(ports)))
+        registered_ip, registered_ports = self.get_registgered()
+        wsl_ipaddress = self.get_wsl_ipaddress()
+
+        if registered_ip == wsl_ipaddress and registered_ports == ports:
+            return
+
+        self.reset()
+        for port in sorted([ports] if isinstance(ports, int) else ports):
+            # netcat 192.168.100.1 -l 22
+            await aioexecute((
+                'netsh', 'interface', 'portproxy', 'add' 'v4tov4',
+                # f'listenport={port}', 'listenaddress=0.0.0.0',
+                f'listenport={port} listenaddress={WINDOWS_ADDRESS} '
+                f'connectport={port}', f'connectaddress={wsl_ipaddress}',
+            ), shell=False)
 
     @classmethod
     def get_wsl_ipaddress(self):
