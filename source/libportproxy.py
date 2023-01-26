@@ -14,9 +14,8 @@ from libbase import aioexecute
 from libbase import execute
 from settings import BASH_EXECUTABLE
 from settings import BINDING_ADDRESS
-from settings import BROADCAST_ADDRESS
 from settings import CWD
-from settings import WINDOWS_ADDRESS
+from settings import EXTERNAL_ADDRESS
 
 
 class portproxy:
@@ -72,7 +71,7 @@ class portproxy:
             execute((
                 f'netsh interface portproxy add v4tov4 '
                 # f'listenport={port} listenaddress=0.0.0.0 '
-                f'listenport={port} listenaddress={WINDOWS_ADDRESS} '
+                f'listenport={port} listenaddress={EXTERNAL_ADDRESS} '
                 f'connectport={port} connectaddress={wsl_ipaddress}'), shell=True)
 
     @classmethod
@@ -92,7 +91,7 @@ class portproxy:
             await aioexecute((
                 'netsh', 'interface', 'portproxy', 'add' 'v4tov4',
                 # f'listenport={port}', 'listenaddress=0.0.0.0',
-                f'listenport={port} listenaddress={WINDOWS_ADDRESS} '
+                f'listenport={port} listenaddress={EXTERNAL_ADDRESS} '
                 f'connectport={port}', f'connectaddress={wsl_ipaddress}',
             ), shell=False)
 

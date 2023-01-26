@@ -31,7 +31,8 @@ if user_path.exists():
 
 DISTRIBUTION = settings.get('DISTRIBUTION', 'Ubuntu-20.04')
 
-WINDOWS_ADDRESS = socket.gethostbyname(socket.gethostname())
+EXTERNAL_ADDRESS = socket.gethostbyname(socket.gethostname())
+EXTERNAL_ADDRESS = settings.get('EXTERNAL_ADDRESS', EXTERNAL_ADDRESS).strip()
 BINDING_ADDRESS = settings.get('BINDING_ADDRESS', '192.168.100.1').strip()
 VETHERNET_ADDRESS = settings.get('VETHERNET_ADDRESS', '192.168.100.2').strip()
 __address_parts = BINDING_ADDRESS.split('.')
