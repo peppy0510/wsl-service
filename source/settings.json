@@ -13,6 +13,8 @@
         587,
         // MySQL, MariaDB
         3306,
+        // PostgreSQL
+        5432,
         // Redis
         6379,
         // HAProxy
