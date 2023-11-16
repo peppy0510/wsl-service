@@ -116,3 +116,10 @@ Default settings fie is `wsl-service/source/settings.json`. Copy to `wsl-service
 ## TODO
 
 * Automatic Windows service registration.
+
+## Reference
+
+* Accessing network applications with WSL
+    - https://learn.microsoft.com/en-us/windows/wsl/networking
+* Advanced settings configuration in WSL
+    - https://learn.microsoft.com/en-us/windows/wsl/wsl-config

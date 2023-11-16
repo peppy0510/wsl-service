@@ -24,7 +24,8 @@ def merge_dict(*args, add_keys=True):
             if not rtn_dct.get(k):
                 rtn_dct[k] = v
             elif k in rtn_dct and type(v) != type(rtn_dct[k]):  # noqa
-                raise TypeError(f'Overlapping keys exist with different types: original is {type(rtn_dct[k])}, new value is {type(v)}')
+                raise TypeError(('Overlapping keys exist with different types: '
+                                 f'original is {type(rtn_dct[k])}, new value is {type(v)}'))
             elif isinstance(rtn_dct[k], dict) and isinstance(merge_dct[k], collections.abc.Mapping):
                 rtn_dct[k] = merge_dict(rtn_dct[k], merge_dct[k], add_keys=add_keys)
             elif isinstance(v, list):

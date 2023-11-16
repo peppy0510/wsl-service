@@ -32,8 +32,10 @@ class advfirewall:
     def get_registgered(self):
         ports = []
         for protocol in ('TCP', 'UDP',):
-            resp = execute(f'netsh advfirewall firewall show rule name="{FIREWALL_RULE_NAME}{protocol}"', shell=True)
-            lines = [v for v in resp.split('\n') if v.startswith('LocalPort:') or v.startswith('RemotePort:')]
+            resp = execute(('netsh advfirewall firewall show rule '
+                            f'name="{FIREWALL_RULE_NAME}{protocol}"'), shell=True)
+            lines = [v for v in resp.split('\n') if v.startswith(
+                'LocalPort:') or v.startswith('RemotePort:')]
             for line in lines:
                 line = line.split(':')[-1].strip()
                 ports += [int(v) for v in line.split(',') if v.isdigit()]
@@ -42,12 +44,13 @@ class advfirewall:
     @classmethod
     def remove(self):
         for protocol in ('TCP', 'UDP',):
-            execute(f'netsh advfirewall firewall delete rule name="{FIREWALL_RULE_NAME}{protocol}"', shell=True)
+            execute(('netsh advfirewall firewall delete rule '
+                     f'name="{FIREWALL_RULE_NAME}{protocol}"'), shell=True)
 
     @classmethod
     def showall(self):
         ports = self.get_registgered()
         ports = ','.join([str(v) for v in ports])
-        print(f' * PORTS Firewall Opened')
+        print(' * PORTS Firewall Opened')
         print(f'   {ports}')
         print()

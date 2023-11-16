@@ -97,8 +97,8 @@ class portproxy:
 
     @classmethod
     def get_wsl_ipaddress(self):
-        return BINDING_ADDRESS
-
+        # return BINDING_ADDRESS
+        # command = [BASH_EXECUTABLE, 'hostname', '-I']
         command = [BASH_EXECUTABLE, '-c', ('ip addr show eth0 | grep "inet\\b" '
                                            '| awk "{print $2}" | cut -d/ -f1')]
         proc = subprocess.Popen(
