@@ -35,6 +35,7 @@
         // NFS
         111,
         2049,
+        20048,
         // Cassandra
         9042,
         // ChromeDev
