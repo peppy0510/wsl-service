@@ -101,8 +101,9 @@ async def aiomain():
             setup_network_inside_wsl()
 
         print()
-        await initd.systemd(INITD_SERVICES)
-        # await initd.service(INITD_SERVICES)
+        time.sleep(5)
+        await initd.systemd(INITD_SERVICES, concurrent=False)
+        # await initd.service(INITD_SERVICES, concurrent=False)
         print()
         initd.execute(INITD_EXECUTES)
         print() if INITD_EXECUTES else None
