@@ -73,15 +73,32 @@ class initd:
         return services
 
     @classmethod
-    async def systemd(self, services=[], concurrent=True):
+    async def systemd(self, services=[], disallowed_services=[], concurrent=True):
         services += self.get_systemd_services()
         services = sorted(list(set(services)))
+        services = [v for v in services if v not in disallowed_services]
         await self.service(services, concurrent=concurrent)
 
     @classmethod
     async def service(self, services, concurrent=True):
         if not services:
             return ''
+
+        high_priorities = (
+            'ssh', 'cron', 'rpcbind',
+            'nmbd', 'smbd', 'sysstat',)
+        low_priorities = (
+            'collectd', 'haproxy',
+            'redis-server', 'elasticsearch', 'mariadb',)
+        high_services = [v for v in high_priorities if v in services]
+        low_services = [v for v in low_priorities if v in services]
+        mid_services = [v for v in services if (
+            v not in high_priorities and v not in low_priorities)]
+        services = high_services + mid_services + low_services
+        # services = [v for v in services if 'mariadb' not in v]
+        # services += ['mariadb']
+        # services = [v for v in services if 'rpcbind' not in v]
+        # services += ['rpcbind']
 
         # prefix = 'sudo nohup service'
         # suffix = '>/dev/null 2>&1'

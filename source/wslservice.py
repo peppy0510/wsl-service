@@ -25,6 +25,7 @@ from settings import DISTRIBUTION
 from settings import FIREWALL_ALLOWED_PORTS
 from settings import INITD_EXECUTES
 from settings import INITD_SERVICES
+from settings import INITD_DISALLOWED_SERVICES
 from settings import PROXY_FORWARDING_TCP_PORTS
 from settings import VETHERNET_ADDRESS
 from settings import WSL_EXECUTABLE
@@ -102,7 +103,7 @@ async def aiomain():
 
         print()
         time.sleep(5)
-        await initd.systemd(INITD_SERVICES, concurrent=False)
+        await initd.systemd(INITD_SERVICES, INITD_DISALLOWED_SERVICES, concurrent=False)
         # await initd.service(INITD_SERVICES, concurrent=False)
         print()
         initd.execute(INITD_EXECUTES)

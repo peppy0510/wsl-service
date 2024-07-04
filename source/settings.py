@@ -40,6 +40,7 @@ __address_parts[-1] = '255'
 BROADCAST_ADDRESS = '.'.join(__address_parts)
 
 INITD_SERVICES = settings.get('INITD_SERVICES', [])
+INITD_DISALLOWED_SERVICES = settings.get('INITD_DISALLOWED_SERVICES', [])
 INITD_EXECUTES = settings.get('INITD_EXECUTES', [])
 
 PROXY_FORWARDING_TCP_PORTS = list(set(settings.get('PROXY_FORWARDING_TCP_PORTS', [])))

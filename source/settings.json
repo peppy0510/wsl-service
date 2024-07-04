@@ -85,5 +85,6 @@
     "FIREWALL_ALLOWED_PORTS": [80, 443, 8000, 8080, 8443, 5037],
     // "INITD_SERVICES": ["ssh", "mysql", "redis-server"],
     "INITD_SERVICES": [],
+    "INITD_DISALLOWED_SERVICES": ["rpcbind"],
     "INITD_EXECUTES": []
 }
