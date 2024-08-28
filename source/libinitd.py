@@ -44,7 +44,7 @@ class initd:
         services = SERVICES_INCLUDES
 
         for line in lines:
-            matched = re.match(r'^\[\s([\+\-\?])\s\][\s]{1,}([a-zA-Z\.]{1,})$', line)
+            matched = re.match(r'^\[\s([\+\-\?])\s\][\s]{1,}([a-zA-Z0-9\.]{1,})$', line)
             if matched:
                 name = matched.group(2)
                 services += [name]
