@@ -23,9 +23,9 @@ from settings import BINDING_ADDRESS
 from settings import BROADCAST_ADDRESS
 from settings import DISTRIBUTION
 from settings import FIREWALL_ALLOWED_PORTS
+from settings import INITD_DISALLOWED_SERVICES
 from settings import INITD_EXECUTES
 from settings import INITD_SERVICES
-from settings import INITD_DISALLOWED_SERVICES
 from settings import PROXY_FORWARDING_TCP_PORTS
 from settings import VETHERNET_ADDRESS
 from settings import WSL_EXECUTABLE
@@ -60,7 +60,7 @@ ENABLE_NETWORK = False if args.initd_only else ENABLE_NETWORK
 def setup_network_inside_wsl():
 
     execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} -u root '
-             f'ip addr del {BINDING_ADDRESS}/24'
+             f'ip addr del {BINDING_ADDRESS}/24 '
              'dev eth0 label eth0:1'), display_error=False)
 
     execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} -u root '
@@ -68,12 +68,18 @@ def setup_network_inside_wsl():
              'dev eth0 label eth0:1'), display_error=False)
 
 
+def launch_dbus_wsl():
+
+    execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} '
+             f'--exec dbus-launch true'), display_error=False)
+
+
 async def aiomain():
 
     if ENABLE_NETWORK:
         shutdown()
+        launch_dbus_wsl()
         portproxy.reset()
-
         advfirewall.remove()
 
         # setup_network_inside_wsl()
@@ -98,12 +104,12 @@ async def aiomain():
     if ENABLE_INITD:
         if not ENABLE_NETWORK:
             shutdown()
-
+            launch_dbus_wsl()
             setup_network_inside_wsl()
 
-        print()
+        # print()
         time.sleep(5)
-        await initd.systemd(INITD_SERVICES, INITD_DISALLOWED_SERVICES, concurrent=False)
+        # await initd.systemd(INITD_SERVICES, INITD_DISALLOWED_SERVICES, concurrent=False)
         # await initd.service(INITD_SERVICES, concurrent=False)
         print()
         initd.execute(INITD_EXECUTES)

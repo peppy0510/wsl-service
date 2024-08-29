@@ -70,6 +70,8 @@ class initd:
                 services.pop(i)
                 continue
 
+        # systemctl list-unit-files --type=service
+
         return services
 
     @classmethod
@@ -84,17 +86,20 @@ class initd:
         if not services:
             return ''
 
-        high_priorities = (
+        very_high_priorities = (
             'ssh', 'cron', 'rpcbind',
-            'nmbd', 'smbd', 'sysstat',)
+            'nmbd', 'smbd', 'sysstat', 'apport',)
+        high_priorities = (
+            'haproxy', 'nginx',
+            'redis-server', 'mariadb', 'elasticsearch',)
         low_priorities = (
-            'collectd', 'haproxy',
-            'redis-server', 'elasticsearch', 'mariadb',)
+            'collectd',)
+        very_high_services = [v for v in very_high_priorities if v in services]
         high_services = [v for v in high_priorities if v in services]
         low_services = [v for v in low_priorities if v in services]
         mid_services = [v for v in services if (
-            v not in high_priorities and v not in low_priorities)]
-        services = high_services + mid_services + low_services
+            v not in (very_high_priorities + high_priorities + low_priorities))]
+        services = very_high_services + high_services + mid_services + low_services
         # services = [v for v in services if 'mariadb' not in v]
         # services += ['mariadb']
         # services = [v for v in services if 'rpcbind' not in v]
