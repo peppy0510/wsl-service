@@ -1,5 +1,5 @@
 {
-    "DISTRIBUTION": "Ubuntu-22.04",
+    "DISTRIBUTION": "Ubuntu-24.04",
     "EXTERNAL_ADDRESS": "",
     "BINDING_ADDRESS": "192.168.100.1",
     "VETHERNET_ADDRESS": "192.168.100.2",
