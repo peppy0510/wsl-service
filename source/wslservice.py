@@ -17,6 +17,7 @@ from libbase import shutdown
 from libinitd import initd
 from libportproxy import portproxy
 from libuaccontrol import run_as_admin
+from powershell import patch_powershell_history
 from settings import ANSI_BACKGROUND_WHITE
 from settings import ANSI_RESET
 from settings import BINDING_ADDRESS
@@ -33,6 +34,7 @@ from settings import WSL_EXECUTABLE
 
 ENABLE_INITD = True
 ENABLE_NETWORK = True
+PATCH_POWERSHELL_HISTORY = True
 
 
 parser = argparse.ArgumentParser(prog='python wslservice.py', add_help=True)
@@ -75,7 +77,6 @@ def launch_dbus_wsl():
 
 
 async def aiomain():
-
     if ENABLE_NETWORK:
         shutdown()
         launch_dbus_wsl()
@@ -117,6 +118,9 @@ async def aiomain():
         print(' ' + ' WSL INITIALIZATION SUCCESS '.join([ANSI_BACKGROUND_WHITE, ANSI_RESET]))
         print()
         time.sleep(1)
+
+    if PATCH_POWERSHELL_HISTORY:
+        patch_powershell_history()
 
 
 def main():
