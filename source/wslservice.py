@@ -34,7 +34,7 @@ from settings import WSL_EXECUTABLE
 
 ENABLE_INITD = True
 ENABLE_NETWORK = True
-PATCH_POWERSHELL_HISTORY = True
+PATCH_POWERSHELL_HISTORY = False
 
 
 parser = argparse.ArgumentParser(prog='python wslservice.py', add_help=True)
