@@ -7,8 +7,7 @@
         // FTP
         // 21,
         // SSH
-        22,
-        23,
+        22, 23,
         // SMTP
         587,
         // MySQL, MariaDB
@@ -18,24 +17,17 @@
         // Redis
         6379,
         // HAProxy
-        9000,
+        32600,
+        // MinIO
+        9000, 9001,
         // RabbitMQ
-        5672,
-        15672,
-        25672,
+        5672, 15672, 25672,
         // Elasticsearch
-        5601,
-        6443,
-        9100,
-        9200,
-        9300,
+        5601, 6443, 9100, 9200, 9300,
         // SMB
-        139,
-        445,
+        139, 445,
         // NFS
-        111,
-        2049,
-        20048,
+        111, 2049, 20048,
         // Cassandra
         9042,
         // ChromeDev
@@ -47,37 +39,24 @@
         // jitsi turnserver
         5349,
         // HTTP HTTPS WebService
-        80,
-        81,
-        443,
-        8000,
-        8080,
-        8443,
+        80, 81, 443, 8000, 8080, 8443,
         // IONIC
-        8100,
-        8200,
-        18088,
+        8100, 8200, 18088,
         // React Native
         // 5037,
-        8081,
-        8082,
-        8097,
+        8081, 8082, 8097,
         // React Native EXPO
-        19000,
-        19001,
-        19002,
-        19003,
-        19004,
-        19005,
-        19006
+        19000, 19001, 19002, 19003, 19004, 19005, 19006
     ],
     "PROXY_FORWARDING_UDP_PORTS": [
         // jitsi turnserver
         3478,
         // jitsi coturn
-        // 5000,
+        5000,
         // jitsi
-        10000
+        10000,
+        // XMPP
+        5298
     ],
     "SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS": [],
     // If you want to seperate ports with proxy.
