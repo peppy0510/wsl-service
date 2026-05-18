@@ -17,8 +17,10 @@ from pathlib import Path
 
 FIREWALL_RULE_NAME = '+WSL'
 
-WSL_EXECUTABLE = str(Path('C:/Windows/System32/wsl.exe'))
-BASH_EXECUTABLE = str(Path('C:/Windows/System32/bash.exe'))
+WSL_EXECUTABLE = str(Path('wsl.exe'))
+BASH_EXECUTABLE = str(Path('bash.exe'))
+# WSL_EXECUTABLE = str(Path('C:/Windows/System32/wsl.exe'))
+# BASH_EXECUTABLE = str(Path('C:/Windows/System32/bash.exe'))
 
 default_path = Path(__file__).resolve().parent.joinpath('settings.json')
 user_path = Path(__file__).resolve().parent.parent.joinpath('settings.json')

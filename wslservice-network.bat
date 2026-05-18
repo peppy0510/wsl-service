@@ -1,1 +1,1 @@
-python source/wslservice.py --network_only
+python.exe source/wslservice.py --network_only

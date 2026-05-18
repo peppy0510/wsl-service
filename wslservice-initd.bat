@@ -1,1 +1,1 @@
-python source/wslservice.py --initd_only
+python.exe source/wslservice.py --initd_only

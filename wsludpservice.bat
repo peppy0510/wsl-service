@@ -1,1 +1,1 @@
-pythonw source/wsludpservice.py
+pythonw.exe source/wsludpservice.py
