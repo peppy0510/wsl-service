@@ -83,16 +83,17 @@ async def aiomain():
         portproxy.reset()
         advfirewall.remove()
 
-        # setup_network_inside_wsl()
+        setup_network_inside_wsl()
 
-        # execute((f'netsh interface ip add address '
-        #          f'"vEthernet (WSL)" {VETHERNET_ADDRESS} 255.255.255.0'))
+        execute((f'netsh interface ip add address '
+                 f'"vEthernet (WSL)" {VETHERNET_ADDRESS} 255.255.255.0'), display_error=False)
 
-        # execute((f'netsh interface ip add address '
-        #          f'"vEthernet (WSLCore)" {VETHERNET_ADDRESS} 255.255.255.0'))
+        execute((f'netsh interface ip add address '
+                 f'"vEthernet (WSLCore)" {VETHERNET_ADDRESS} 255.255.255.0'), display_error=False)
 
-        # execute((f'netsh interface ip add address '
-        #          f'"vEthernet (WSL (Hyper-V firewall))" {VETHERNET_ADDRESS} 255.255.255.0'))
+        execute((f'netsh interface ip add address '
+                 f'"vEthernet (WSL (Hyper-V firewall))" {VETHERNET_ADDRESS} '
+                 f'255.255.255.0'), display_error=False)
 
         print()
 
