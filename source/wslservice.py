@@ -14,8 +14,11 @@ import time
 from libadvfirewall import advfirewall
 from libbase import execute
 from libbase import shutdown
+from libhypervfirewall import hypervfirewall
 from libinitd import initd
 from libportproxy import portproxy
+from libresume import resume
+from libschtasks import schtasks
 from libuaccontrol import run_as_admin
 from powershell import patch_powershell_history
 from settings import ANSI_BACKGROUND_WHITE
@@ -27,7 +30,9 @@ from settings import FIREWALL_ALLOWED_PORTS
 from settings import INITD_DISALLOWED_SERVICES
 from settings import INITD_EXECUTES
 from settings import INITD_SERVICES
+from settings import NETWORK_MODE
 from settings import PROXY_FORWARDING_TCP_PORTS
+from settings import RESUME_ACTION
 from settings import VETHERNET_ADDRESS
 from settings import WSL_EXECUTABLE
 
@@ -53,6 +58,25 @@ parser.add_argument(
     help='initd only',
 )
 
+parser.add_argument(
+    '-r',
+    '--resume',
+    action='store_true',
+    help='recover after the host resumed from sleep',
+)
+
+parser.add_argument(
+    '--install_task',
+    action='store_true',
+    help='register the scheduled tasks',
+)
+
+parser.add_argument(
+    '--uninstall_task',
+    action='store_true',
+    help='remove the scheduled tasks',
+)
+
 args = parser.parse_args()
 
 ENABLE_INITD = False if args.network_only else ENABLE_INITD
@@ -60,6 +84,11 @@ ENABLE_NETWORK = False if args.initd_only else ENABLE_NETWORK
 
 
 def setup_network_inside_wsl():
+
+    if BINDING_ADDRESS == resume.default_field('via'):
+        print(f' * BINDING_ADDRESS {BINDING_ADDRESS} is the gateway of the distribution')
+        print()
+        return
 
     execute((f'{WSL_EXECUTABLE} -d {DISTRIBUTION} -u root '
              f'ip addr del {BINDING_ADDRESS}/24 '
@@ -77,37 +106,71 @@ def launch_dbus_wsl():
 
 
 async def aiomain():
+    if args.uninstall_task:
+        schtasks.uninstall()
+        schtasks.showall()
+        return
+
+    if args.install_task:
+        schtasks.install()
+        schtasks.showall()
+        return
+
+    restart = NETWORK_MODE != 'mirrored'
+
+    if args.resume:
+        if RESUME_ACTION == 'none':
+            return
+        if RESUME_ACTION == 'heal' and resume.heal():
+            return
+        restart = True
+
     if ENABLE_NETWORK:
-        shutdown()
+        if restart:
+            shutdown()
+
         launch_dbus_wsl()
-        portproxy.reset()
-        advfirewall.remove()
 
-        setup_network_inside_wsl()
+        if NETWORK_MODE == 'mirrored':
+            portproxy.reset()
 
-        execute((f'netsh interface ip add address '
-                 f'"vEthernet (WSL)" {VETHERNET_ADDRESS} 255.255.255.0'), display_error=False)
+            print()
 
-        execute((f'netsh interface ip add address '
-                 f'"vEthernet (WSLCore)" {VETHERNET_ADDRESS} 255.255.255.0'), display_error=False)
+            hypervfirewall.add(FIREWALL_ALLOWED_PORTS)
+            hypervfirewall.showall()
 
-        execute((f'netsh interface ip add address '
-                 f'"vEthernet (WSL (Hyper-V firewall))" {VETHERNET_ADDRESS} '
-                 f'255.255.255.0'), display_error=False)
+        else:
+            hypervfirewall.remove()
+            portproxy.reset()
+            advfirewall.remove()
 
-        print()
+            setup_network_inside_wsl()
 
-        portproxy.add(PROXY_FORWARDING_TCP_PORTS)
-        portproxy.showall()
+            execute((f'netsh interface ip add address '
+                     f'"vEthernet (WSL)" {VETHERNET_ADDRESS} 255.255.255.0'), display_error=False)
+
+            execute((f'netsh interface ip add address '
+                     f'"vEthernet (WSLCore)" {VETHERNET_ADDRESS} 255.255.255.0'), display_error=False)
+
+            execute((f'netsh interface ip add address '
+                     f'"vEthernet (WSL (Hyper-V firewall))" {VETHERNET_ADDRESS} '
+                     f'255.255.255.0'), display_error=False)
+
+            print()
+
+            portproxy.add(PROXY_FORWARDING_TCP_PORTS)
+            portproxy.showall()
 
         advfirewall.add(FIREWALL_ALLOWED_PORTS)
         advfirewall.showall()
 
     if ENABLE_INITD:
         if not ENABLE_NETWORK:
-            shutdown()
+            if restart:
+                shutdown()
             launch_dbus_wsl()
-            setup_network_inside_wsl()
+            if NETWORK_MODE != 'mirrored':
+                setup_network_inside_wsl()
 
         # print()
         time.sleep(5)

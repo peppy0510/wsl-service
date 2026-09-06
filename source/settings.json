@@ -1,5 +1,8 @@
 {
     "DISTRIBUTION": "Ubuntu-24.04",
+    // "portproxy": a static WSL address published with netsh portproxy.
+    // "mirrored": networkingMode=mirrored in .wslconfig, Hyper-V firewall instead of portproxy.
+    "NETWORK_MODE": "portproxy",
     "EXTERNAL_ADDRESS": "",
     "BINDING_ADDRESS": "192.168.100.1",
     "VETHERNET_ADDRESS": "192.168.100.2",
@@ -65,5 +68,15 @@
     // "INITD_SERVICES": ["ssh", "mysql", "redis-server"],
     "INITD_SERVICES": [],
     "INITD_DISALLOWED_SERVICES": ["rpcbind"],
-    "INITD_EXECUTES": []
+    "INITD_EXECUTES": [],
+    // "restart": restart the distribution, "heal": recover the broken layer only, "none": skip.
+    "RESUME_ACTION": "restart",
+    // Optional hostname resolved inside WSL. Empty only checks that the default route is there.
+    "RESUME_PROBE_HOST": "",
+    // Ports connected from the host, so something inside WSL has to listen on them.
+    "RESUME_PROBE_PORTS": [],
+    // Empty writes to %ProgramData%\wsl-service\resume.log
+    "RESUME_LOG_PATH": "",
+    // Keeps the distribution running from boot without a user logon.
+    "KEEPALIVE": false
 }

@@ -25,9 +25,10 @@ class run_as_admin:
         else:
             # self.bypass_uac()
             # self.create_reg_key(DELEGATE_EXEC_REG_KEY, '')
-            file = str(Path(__file__).resolve())
+            file = str(Path(sys.argv[0]).resolve())
+            params = ' '.join([f'"{v}"' for v in [file] + sys.argv[1:]])
             ctypes.windll.shell32.ShellExecuteW(
-                None, 'runas', sys.executable, file, None, 1)
+                None, 'runas', sys.executable, params, None, 1)
 
     def is_admin(self):
         try:

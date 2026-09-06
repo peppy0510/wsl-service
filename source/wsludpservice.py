@@ -12,6 +12,7 @@ import socket
 import threading
 
 from settings import BINDING_ADDRESS
+from settings import NETWORK_MODE
 from settings import PROXY_FORWARDING_UDP_PORTS
 from settings import SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS
 
@@ -67,6 +68,10 @@ async def aiomain():
 
 
 def main():
+    if NETWORK_MODE == 'mirrored':
+        print(' * UDP forwarding is not used in mirrored network mode')
+        return
+
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(aiomain())
