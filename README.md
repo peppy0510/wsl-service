@@ -43,9 +43,12 @@ option.
 | --- | --- | --- |
 | `WSLService` | Boot | Publishes the ports and runs the init commands. |
 | `WSL-Resume` | Resume from sleep, delayed 10s | Applies `RESUME_ACTION`. |
-| `WSL-Boot` | Boot | Holds the distribution running. Registered when `KEEPALIVE` is enabled. |
+| `WSL-Boot` | Boot, and a WSL update installed, delayed 30s | Holds the distribution running. Registered when `KEEPALIVE` is enabled. |
 
 `wslservicetask.bat` runs the registered `WSLService` task on demand.
+
+`wslservice-restart.bat` shuts WSL down and starts it again through the `WSL-Boot` task, so it needs
+`KEEPALIVE`. Use it when the distribution is stuck; it has to run elevated.
 
 ## Network modes
 

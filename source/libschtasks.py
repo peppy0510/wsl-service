@@ -68,6 +68,14 @@ RESUME_TRIGGER = '''    <EventTrigger>
       <Delay>PT10S</Delay>
     </EventTrigger>'''
 
+WSL_UPDATE_TRIGGER = '''    <EventTrigger>
+      <Subscription>&lt;QueryList&gt;&lt;Query Id="0" Path="Application"&gt;&lt;Select Path="Application"&gt;\
+*[System[Provider[@Name='MsiInstaller'] and (EventID=11707)]] and \
+*[EventData[Data='Product: Windows Subsystem for Linux -- Installation completed successfully.']]\
+&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;</Subscription>
+      <Delay>PT30S</Delay>
+    </EventTrigger>'''
+
 
 class schtasks:
 
@@ -105,7 +113,7 @@ class schtasks:
             user_id=user_id,
             description='Keeps the WSL distribution running without a user logon.',
             execution_time_limit='PT0S',
-            trigger=BOOT_TRIGGER,
+            trigger='\n'.join((BOOT_TRIGGER, WSL_UPDATE_TRIGGER)),
             command='conhost.exe',
             arguments=f'--headless wsl.exe -d {DISTRIBUTION} -u root -- sleep infinity',
             working_directory=PROJECT_PATH))

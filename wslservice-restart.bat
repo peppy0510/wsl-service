@@ -1,0 +1,9 @@
+@echo off
+echo [1/3] Shutting down WSL...
+wsl.exe --shutdown
+echo [2/3] Waiting for WSL-Boot task to stop...
+powershell.exe -NoProfile -Command "$d = (Get-Date).AddSeconds(30); while ((Get-ScheduledTask -TaskName 'WSL-Boot').State -eq 'Running' -and (Get-Date) -lt $d) { Start-Sleep -Milliseconds 500 }"
+echo [3/3] Starting WSL-Boot task...
+schtasks /Run /TN "WSL-Boot"
+wsl.exe -l -v
+timeout /t 5 >nul
