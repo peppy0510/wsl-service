@@ -21,6 +21,8 @@ class advfirewall:
         if ports == self.get_registgered():
             return
         self.remove()
+        if not ports:
+            return
         ports = ','.join([str(v) for v in sorted(ports)])
         common = 'netsh advfirewall firewall add rule action=allow'
         for direction in ('in', 'out',):

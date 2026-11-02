@@ -12,7 +12,6 @@ import socket
 import subprocess
 
 from libjson import load_commented_json
-from libjson import merge_dict
 from pathlib import Path
 
 
@@ -30,7 +29,11 @@ settings = load_commented_json(str(default_path))
 
 if user_path.exists():
     user_settings = load_commented_json(str(user_path))
-    settings = merge_dict(settings, user_settings)
+    for key, value in user_settings.items():
+        if key in settings and type(value) is not type(settings[key]):
+            raise TypeError((f'{key} in {user_path} must be {type(settings[key]).__name__}, '
+                             f'not {type(value).__name__}'))
+    settings = {**settings, **user_settings}
 
 DISTRIBUTION = settings.get('DISTRIBUTION', 'Ubuntu-26.04')
 

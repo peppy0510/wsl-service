@@ -21,6 +21,8 @@ class hypervfirewall:
         if ports == self.get_registgered():
             return
         self.remove()
+        if not ports:
+            return
         ports = ','.join([str(v) for v in ports])
         for protocol in ('TCP', 'UDP',):
             powershell((f'New-NetFirewallHyperVRule -VMCreatorId "{HYPERV_VM_CREATOR_ID}" '

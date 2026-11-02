@@ -83,8 +83,9 @@ should hold on to an interface name across a resume.
 
 ## Your own configuration
 
-`source/settings.json` holds the defaults. Copy it to the repository root and edit that copy,
-which is merged over the defaults.
+`source/settings.json` holds the defaults. Copy it to the repository root and edit that copy.
+Every key set there replaces the default value as a whole, so a port removed from a list stays
+closed. Keys left out keep their defaults.
 
 * `EXTERNAL_ADDRESS`: Host address the ports are published on. Empty picks the address of the
   adapter that holds the default route.
