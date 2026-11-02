@@ -6,6 +6,7 @@
     "EXTERNAL_ADDRESS": "",
     "BINDING_ADDRESS": "192.168.100.1",
     "VETHERNET_ADDRESS": "192.168.100.2",
+    // Every port in the lists below is reachable from the LAN. Keep only what has to be.
     "PROXY_FORWARDING_TCP_PORTS": [
         // FTP
         // 21,
@@ -61,11 +62,12 @@
         // XMPP
         5298
     ],
+    // UDP ports whose packets are prefixed with the sender as "host:port".
     "SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS": [],
-    // If you want to seperate ports with proxy.
-    // If you want to forward directly with reverse proxy web server on windows such as Apache, Caddy, Nginx, ...
+    // Extra ports opened on the firewall without forwarding, such as a reverse proxy on Windows.
+    // Every forwarded port above is opened as well.
     "FIREWALL_ALLOWED_PORTS": [80, 443, 8000, 8080, 8443, 5037],
-    // "INITD_SERVICES": ["ssh", "mysql", "redis-server"],
+    // Not applied at the moment, use systemd inside WSL or INITD_EXECUTES.
     "INITD_SERVICES": [],
     "INITD_DISALLOWED_SERVICES": ["rpcbind"],
     "INITD_EXECUTES": [],

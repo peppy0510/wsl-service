@@ -16,9 +16,28 @@
 ## How to use
 
 * Download or clone this repository.
-* Copy `source/settings.json` to the repository root and edit your own settings.
+* Create `settings.json` in the repository root, see [Your own configuration](#your-own-configuration).
+* Run `wslservice-check.bat` and fix every problem it reports.
 * Run `wslservice.bat` once to check that it works on your machine.
 * Register the scheduled tasks with `wslservice-install-task.bat`.
+
+## First setup
+
+Everything except the last two steps reads the machine without changing it, so it is safe to run
+again and again.
+
+1. `wsl.exe -l -v` lists the installed distributions. Put the exact name into `DISTRIBUTION`.
+2. Look up `networkingMode` in `%USERPROFILE%\.wslconfig`. `mirrored` there means
+   `"NETWORK_MODE": "mirrored"`, anything else or nothing means `portproxy`.
+3. List what listens inside WSL with `ss -ltnp` and `ss -lunp`. Every port in the port lists is
+   reachable from the LAN, so keep only what other machines have to reach. The defaults include
+   databases and many services you probably do not run.
+4. Write only the keys that differ from `source/settings.json` into your own `settings.json`.
+5. Run `wslservice-check.bat`, or `python.exe source/wslservice.py --check` from a WSL shell inside
+   the repository. It prints the resolved settings and the ports that will be opened, checks them
+   against the machine, and exits with 1 when something has to be fixed. It needs no elevation.
+6. Run `wslservice.bat` elevated. It asks for elevation itself and then applies everything.
+7. Run `wslservice-install-task.bat` elevated.
 
 ## How to register
 
@@ -83,21 +102,43 @@ should hold on to an interface name across a resume.
 
 ## Your own configuration
 
-`source/settings.json` holds the defaults. Copy it to the repository root and edit that copy.
-Every key set there replaces the default value as a whole, so a port removed from a list stays
-closed. Keys left out keep their defaults.
+`source/settings.json` holds the defaults. Your own `settings.json` in the repository root only
+needs the keys you change. Every key set there replaces the default value as a whole, so a port
+removed from a list stays closed. Keys left out keep their defaults.
 
+* Comments are whole lines starting with `//`. A comment after a value on the same line breaks
+  the file.
+* A value must keep the type of its default, a list stays a list and `KEEPALIVE` stays `true` or
+  `false`. Anything else stops with an error naming the key.
+
+Every port in `PROXY_FORWARDING_TCP_PORTS`, `PROXY_FORWARDING_UDP_PORTS`,
+`SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS` and `FIREWALL_ALLOWED_PORTS` is opened on the
+Windows firewall, and in `mirrored` mode on the Hyper-V firewall as well. In `mirrored` mode
+nothing is forwarded, so the forwarding lists only decide which ports are opened.
+
+* `DISTRIBUTION`: Name of the distribution exactly as `wsl.exe -l -v` prints it.
+* `NETWORK_MODE`: `portproxy` or `mirrored`, see above. It has to match `networkingMode` in
+  `.wslconfig`.
 * `EXTERNAL_ADDRESS`: Host address the ports are published on. Empty picks the address of the
   adapter that holds the default route.
-* `BINDING_ADDRESS`: Static local ip address for your WSL. It must stay outside the subnet of
-  your LAN, otherwise it collides with your router and breaks routing inside WSL.
+* `BINDING_ADDRESS`: Static local ip address for your WSL, `portproxy` mode only. It must stay
+  outside the subnet of your LAN, otherwise it collides with your router and breaks routing inside
+  WSL.
 * `VETHERNET_ADDRESS`: Address given to the host side `vEthernet (WSL)` adapters, `portproxy`
   mode only.
-* `FIREWALL_ALLOWED_PORTS`: Ports opened on the Windows firewall.
-* `PROXY_FORWARDING_TCP_PORTS`: Ports forwarded from the host to WSL.
-* `INITD_SERVICES`: Services started inside WSL, such as ssh, nginx, mysql or redis.
-* `INITD_EXECUTES`: Commands run inside WSL after the services, such as your own server.
-* `NETWORK_MODE`: `portproxy` or `mirrored`, see above.
+* `PROXY_FORWARDING_TCP_PORTS`: Ports forwarded from the host to WSL with `netsh interface
+  portproxy`.
+* `PROXY_FORWARDING_UDP_PORTS`: Ports relayed from the host to WSL by `wsludpservice.bat`, which
+  is not registered as a task and has to be started on its own. `portproxy` mode only.
+* `SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS`: Same as above, but every relayed packet is
+  prefixed with the sender as `host:port`, for a server inside WSL that needs to know who sent it.
+* `FIREWALL_ALLOWED_PORTS`: Extra ports opened on the firewall without forwarding, such as a
+  reverse proxy running on Windows.
+* `INITD_EXECUTES`: Commands run inside WSL at start, such as your own server.
+* `INITD_SERVICES`, `INITD_DISALLOWED_SERVICES`: Not applied at the moment. Enable services with
+  systemd inside WSL, or start them from `INITD_EXECUTES`.
+* `HYPERV_VM_CREATOR_ID`: Id of the WSL virtual machine for the Hyper-V firewall. The default is
+  the id WSL registers, so leave it out.
 * `RESUME_ACTION`: `restart`, `heal` or `none`, see above.
 * `RESUME_PROBE_HOST`: Optional hostname resolved inside WSL. Left empty, outbound networking is
   judged by the presence of the default route alone, which needs no network of its own.

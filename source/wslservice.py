@@ -9,10 +9,12 @@ email: peppy0510@hotmail.com
 
 import argparse
 import asyncio
+import sys
 import time
 
 from libadvfirewall import advfirewall
 from libbase import execute
+from libcheck import check
 from libbase import shutdown
 from libhypervfirewall import hypervfirewall
 from libinitd import initd
@@ -75,6 +77,13 @@ parser.add_argument(
     '--uninstall_task',
     action='store_true',
     help='remove the scheduled tasks',
+)
+
+parser.add_argument(
+    '-c',
+    '--check',
+    action='store_true',
+    help='print the resolved settings and check them without changing anything',
 )
 
 args = parser.parse_args()
@@ -194,7 +203,9 @@ def main():
 
 
 if __name__ == '__main__':
-    if args.initd_only:
+    if args.check:
+        sys.exit(check.run())
+    elif args.initd_only:
         main()
     else:
         run_as_admin(main)
