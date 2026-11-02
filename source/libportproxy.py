@@ -8,13 +8,9 @@ email: peppy0510@hotmail.com
 
 
 import re
-import subprocess
 
-from libbase import aioexecute
+from libbase import bash
 from libbase import execute
-from settings import BASH_EXECUTABLE
-from settings import BINDING_ADDRESS
-from settings import CWD
 from settings import EXTERNAL_ADDRESS
 
 
@@ -22,7 +18,6 @@ class portproxy:
 
     @classmethod
     def reset(self):
-        # self.get_registgered()
         execute('netsh interface portproxy reset', shell=True)
 
     @classmethod
@@ -54,7 +49,6 @@ class portproxy:
 
     @classmethod
     def add(self, ports):
-        ports = sorted(ports)
         ports = [ports] if isinstance(ports, int) else ports
         ports = sorted(list(set(ports)))
         registered_ip, registered_ports = self.get_registgered()
@@ -64,45 +58,13 @@ class portproxy:
             return
 
         self.reset()
-        for port in sorted([ports] if isinstance(ports, int) else ports):
-            # execute((f'netcat {wsl_ipaddress} -l {port}'), shell=True)
-            # command = ['netcat', f'{wsl_ipaddress}', f'{port}', '-l']
-
+        for port in ports:
             execute((
                 f'netsh interface portproxy add v4tov4 '
-                # f'listenport={port} listenaddress=0.0.0.0 '
                 f'listenport={port} listenaddress={EXTERNAL_ADDRESS} '
                 f'connectport={port} connectaddress={wsl_ipaddress}'), shell=True)
 
     @classmethod
-    async def aioadd(self, ports):
-        ports = sorted(ports)
-        ports = [ports] if isinstance(ports, int) else ports
-        ports = sorted(list(set(ports)))
-        registered_ip, registered_ports = self.get_registgered()
-        wsl_ipaddress = self.get_wsl_ipaddress()
-
-        if registered_ip == wsl_ipaddress and registered_ports == ports:
-            return
-
-        self.reset()
-        for port in sorted([ports] if isinstance(ports, int) else ports):
-            # netcat 192.168.100.1 -l 22
-            await aioexecute((
-                'netsh', 'interface', 'portproxy', 'add' 'v4tov4',
-                # f'listenport={port}', 'listenaddress=0.0.0.0',
-                f'listenport={port} listenaddress={EXTERNAL_ADDRESS} '
-                f'connectport={port}', f'connectaddress={wsl_ipaddress}',
-            ), shell=False)
-
-    @classmethod
     def get_wsl_ipaddress(self):
-        # return BINDING_ADDRESS
-        # command = [BASH_EXECUTABLE, 'hostname', '-I']
-        command = [BASH_EXECUTABLE, '-c', ('ip addr show eth0 | grep "inet\\b" '
-                                           '| awk "{print $2}" | cut -d/ -f1')]
-        proc = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=CWD)
-        resp, error = proc.communicate()
-        resp = re.findall(r'[0-9]+(?:\.[0-9]+){3}', resp)[0]
-        return resp
+        resp = execute(bash('ip -4 -o addr show eth0'), display_error=False) or ''
+        return re.findall(r'inet ([0-9]+(?:\.[0-9]+){3})', resp)[0]

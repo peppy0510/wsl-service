@@ -18,22 +18,20 @@ from pathlib import Path
 FIREWALL_RULE_NAME = '+WSL'
 
 WSL_EXECUTABLE = str(Path('wsl.exe'))
-BASH_EXECUTABLE = str(Path('bash.exe'))
-# WSL_EXECUTABLE = str(Path('C:/Windows/System32/wsl.exe'))
-# BASH_EXECUTABLE = str(Path('C:/Windows/System32/bash.exe'))
 
 default_path = Path(__file__).resolve().parent.joinpath('settings.json')
 user_path = Path(__file__).resolve().parent.parent.joinpath('settings.json')
 
 settings = load_commented_json(str(default_path))
+user_settings = load_commented_json(str(user_path)) if user_path.exists() else {}
 
-if user_path.exists():
-    user_settings = load_commented_json(str(user_path))
-    for key, value in user_settings.items():
-        if key in settings and type(value) is not type(settings[key]):
-            raise TypeError((f'{key} in {user_path} must be {type(settings[key]).__name__}, '
-                             f'not {type(value).__name__}'))
-    settings = {**settings, **user_settings}
+for key, value in user_settings.items():
+    if key in settings and type(value) is not type(settings[key]):
+        raise TypeError((f'{key} in {user_path} must be {type(settings[key]).__name__}, '
+                         f'not {type(value).__name__}'))
+
+UNKNOWN_SETTINGS = sorted(set(user_settings) - set(settings))
+settings = {**settings, **user_settings}
 
 DISTRIBUTION = settings.get('DISTRIBUTION', 'Ubuntu-26.04')
 
@@ -60,8 +58,6 @@ __address_parts = BINDING_ADDRESS.split('.')
 __address_parts[-1] = '255'
 BROADCAST_ADDRESS = '.'.join(__address_parts)
 
-INITD_SERVICES = settings.get('INITD_SERVICES', [])
-INITD_DISALLOWED_SERVICES = settings.get('INITD_DISALLOWED_SERVICES', [])
 INITD_EXECUTES = settings.get('INITD_EXECUTES', [])
 
 PROXY_FORWARDING_TCP_PORTS = list(set(settings.get('PROXY_FORWARDING_TCP_PORTS', [])))
@@ -100,8 +96,6 @@ BOOT_TASK_NAME = 'WSL-Boot'
 RESUME_TASK_NAME = 'WSL-Resume'
 
 CWD = os.path.expanduser('~')
-
-DELEGATE_EXEC_REG_KEY = 'DelegateExecute'
 
 ANSI_BACKGROUND_WHITE = '\x1b[7m'
 ANSI_RESET = '\x1b[0m'

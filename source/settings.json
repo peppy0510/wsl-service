@@ -67,9 +67,7 @@
     // Extra ports opened on the firewall without forwarding, such as a reverse proxy on Windows.
     // Every forwarded port above is opened as well.
     "FIREWALL_ALLOWED_PORTS": [80, 443, 8000, 8080, 8443, 5037],
-    // Not applied at the moment, use systemd inside WSL or INITD_EXECUTES.
-    "INITD_SERVICES": [],
-    "INITD_DISALLOWED_SERVICES": ["rpcbind"],
+    // Commands run inside the distribution at start. Enable services with systemd instead.
     "INITD_EXECUTES": [],
     // "restart": restart the distribution, "heal": recover the broken layer only, "none": skip.
     "RESUME_ACTION": "restart",
@@ -80,5 +78,7 @@
     // Empty writes to %ProgramData%\wsl-service\resume.log
     "RESUME_LOG_PATH": "",
     // Keeps the distribution running from boot without a user logon.
-    "KEEPALIVE": false
+    "KEEPALIVE": false,
+    // Id WSL registers its virtual machine with on the Hyper-V firewall. Leave it as is.
+    "HYPERV_VM_CREATOR_ID": "{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}"
 }

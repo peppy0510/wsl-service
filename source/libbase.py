@@ -7,7 +7,6 @@ email: peppy0510@hotmail.com
 '''
 
 
-import asyncio
 import subprocess
 
 from settings import CWD
@@ -15,32 +14,12 @@ from settings import DISTRIBUTION
 from settings import WSL_EXECUTABLE
 
 
-def decode(string):
-    resp = None
-
-    try:
-        resp = string.decode('utf-8')
-    except UnicodeDecodeError:
-        pass
-
-    if resp is None:
-        try:
-            resp = string.decode('cp949')
-        except UnicodeDecodeError:
-            pass
-
-    if resp is None:
-        resp = string.decode('utf-8', 'ignore')
-
-    return resp
-
-
-def terminate():
-    execute(f'{WSL_EXECUTABLE} -t {DISTRIBUTION}', shell=True)
-
-
 def shutdown():
     execute(f'{WSL_EXECUTABLE} -d {DISTRIBUTION} --shutdown', shell=True)
+
+
+def bash(script):
+    return [WSL_EXECUTABLE, '-d', DISTRIBUTION, '--exec', 'bash', '-c', script]
 
 
 def powershell(command, display_error=True):
@@ -69,29 +48,6 @@ def execute(command, shell=False, display_error=True, close_fds=True):
 
     try:
         resp, error = proc.communicate()
-    except IndexError:
-        pass
-    except UnicodeDecodeError:
-        pass
-
-    if display_error and error and isinstance(error, str):
-        print(error)
-
-    return resp
-
-
-async def aioexecute(command, shell=False, display_error=True, close_fds=True):
-
-    proc = await asyncio.create_subprocess_exec(
-        *command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        text=False, shell=shell, cwd=CWD, close_fds=close_fds)
-
-    resp = None
-    error = None
-
-    try:
-        resp, error = await proc.communicate()
-        # resp, error = await asyncio.wait_for(proc.communicate(), timeout=10)
     except IndexError:
         pass
     except UnicodeDecodeError:

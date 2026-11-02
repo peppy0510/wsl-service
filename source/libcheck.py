@@ -23,6 +23,7 @@ from settings import PROXY_FORWARDING_UDP_PORTS
 from settings import RESUME_ACTION
 from settings import RESUME_PROBE_PORTS
 from settings import SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS
+from settings import UNKNOWN_SETTINGS
 from settings import WSL_EXECUTABLE
 from settings import user_path
 
@@ -38,6 +39,8 @@ class check:
         problems = []
 
         self.show('Settings', str(user_path) if user_path.exists() else 'defaults only')
+        for key in UNKNOWN_SETTINGS:
+            problems.append(f'{key} is not a setting, remove it')
 
         distributions = self.get_distributions()
         self.show('DISTRIBUTION', DISTRIBUTION)

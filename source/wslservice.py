@@ -14,24 +14,21 @@ import time
 
 from libadvfirewall import advfirewall
 from libbase import execute
-from libcheck import check
 from libbase import shutdown
+from libcheck import check
 from libhypervfirewall import hypervfirewall
 from libinitd import initd
 from libportproxy import portproxy
 from libresume import resume
 from libschtasks import schtasks
 from libuaccontrol import run_as_admin
-from powershell import patch_powershell_history
 from settings import ANSI_BACKGROUND_WHITE
 from settings import ANSI_RESET
 from settings import BINDING_ADDRESS
 from settings import BROADCAST_ADDRESS
 from settings import DISTRIBUTION
 from settings import FIREWALL_ALLOWED_PORTS
-from settings import INITD_DISALLOWED_SERVICES
 from settings import INITD_EXECUTES
-from settings import INITD_SERVICES
 from settings import NETWORK_MODE
 from settings import PROXY_FORWARDING_TCP_PORTS
 from settings import RESUME_ACTION
@@ -41,7 +38,6 @@ from settings import WSL_EXECUTABLE
 
 ENABLE_INITD = True
 ENABLE_NETWORK = True
-PATCH_POWERSHELL_HISTORY = False
 
 
 parser = argparse.ArgumentParser(prog='python.exe wslservice.py', add_help=True)
@@ -181,19 +177,13 @@ async def aiomain():
             if NETWORK_MODE != 'mirrored':
                 setup_network_inside_wsl()
 
-        # print()
         time.sleep(5)
-        # await initd.systemd(INITD_SERVICES, INITD_DISALLOWED_SERVICES, concurrent=False)
-        # await initd.service(INITD_SERVICES, concurrent=False)
         print()
         initd.execute(INITD_EXECUTES)
         print() if INITD_EXECUTES else None
         print(' ' + ' WSL INITIALIZATION SUCCESS '.join([ANSI_BACKGROUND_WHITE, ANSI_RESET]))
         print()
         time.sleep(1)
-
-    if PATCH_POWERSHELL_HISTORY:
-        patch_powershell_history()
 
 
 def main():
@@ -209,4 +199,3 @@ if __name__ == '__main__':
         main()
     else:
         run_as_admin(main)
-    # win32serviceutil.HandleCommandLine(AppServerSvc)

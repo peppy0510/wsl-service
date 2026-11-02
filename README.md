@@ -64,7 +64,7 @@ option.
 | `WSL-Resume` | Resume from sleep, delayed 10s | Applies `RESUME_ACTION`. |
 | `WSL-Boot` | Boot, and a WSL update installed, delayed 30s | Holds the distribution running. Registered when `KEEPALIVE` is enabled. |
 
-`wslservicetask.bat` runs the registered `WSLService` task on demand.
+`wslservice-run-task.bat` runs the registered `WSLService` task on demand.
 
 `wslservice-restart.bat` shuts WSL down and starts it again through the `WSL-Boot` task, so it needs
 `KEEPALIVE`. Use it when the distribution is stuck; it has to run elevated.
@@ -134,11 +134,12 @@ nothing is forwarded, so the forwarding lists only decide which ports are opened
   prefixed with the sender as `host:port`, for a server inside WSL that needs to know who sent it.
 * `FIREWALL_ALLOWED_PORTS`: Extra ports opened on the firewall without forwarding, such as a
   reverse proxy running on Windows.
-* `INITD_EXECUTES`: Commands run inside WSL at start, such as your own server.
-* `INITD_SERVICES`, `INITD_DISALLOWED_SERVICES`: Not applied at the moment. Enable services with
-  systemd inside WSL, or start them from `INITD_EXECUTES`.
+* `INITD_EXECUTES`: Commands run with bash inside `DISTRIBUTION` at start, such as your own
+  server. Services such as ssh, nginx or mysql are better enabled with systemd inside WSL.
 * `HYPERV_VM_CREATOR_ID`: Id of the WSL virtual machine for the Hyper-V firewall. The default is
   the id WSL registers, so leave it out.
+
+A key that is not in `source/settings.json` does nothing, and `wslservice-check.bat` reports it.
 * `RESUME_ACTION`: `restart`, `heal` or `none`, see above.
 * `RESUME_PROBE_HOST`: Optional hostname resolved inside WSL. Left empty, outbound networking is
   judged by the presence of the default route alone, which needs no network of its own.
