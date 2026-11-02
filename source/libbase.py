@@ -7,8 +7,11 @@ email: peppy0510@hotmail.com
 '''
 
 
+import configparser
+import os
 import subprocess
 
+from pathlib import Path
 from settings import CWD
 from settings import DISTRIBUTION
 from settings import WSL_EXECUTABLE
@@ -32,6 +35,35 @@ def distributions(running=False):
     # wsl.exe writes UTF-16 unless WSL_UTF8 is set.
     resp = proc.stdout.replace(b'\x00', b'').decode('utf-8', 'ignore')
     return [v.strip() for v in resp.split('\n') if v.strip()]
+
+
+def is_wsl_vm_running():
+    # Anything that asks the distribution itself would start WSL, so look for its VM first.
+    resp = execute('tasklist /FI "IMAGENAME eq vmmemWSL" /FO CSV /NH', shell=True,
+                   display_error=False) or ''
+    return 'vmmemWSL' in resp
+
+
+def wslconfig_path():
+    return Path(os.environ.get('USERPROFILE', '~')).expanduser().joinpath('.wslconfig')
+
+
+def read_wslconfig():
+    '''Every section and key of .wslconfig, or None when it cannot be parsed.'''
+    config = configparser.ConfigParser(strict=False, inline_comment_prefixes=('#', ';',))
+    config.optionxform = str
+    try:
+        config.read(str(wslconfig_path()), encoding='utf-8-sig')
+    except configparser.Error:
+        return None
+    return {section: dict(config.items(section)) for section in config.sections()}
+
+
+def wslconfig_networking_mode():
+    config = read_wslconfig()
+    if config is None:
+        return 'unreadable'
+    return config.get('wsl2', {}).get('networkingMode', 'nat').strip().lower()
 
 
 def powershell(command, display_error=True):

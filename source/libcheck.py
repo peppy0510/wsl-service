@@ -7,11 +7,11 @@ email: peppy0510@hotmail.com
 '''
 
 
-import configparser
-import os
-
 from libbase import distributions
-from pathlib import Path
+from libbase import read_wslconfig
+from libbase import wslconfig_networking_mode
+from libbase import wslconfig_path
+from libreport import report
 from settings import BINDING_ADDRESS
 from settings import DISTRIBUTION
 from settings import EXTERNAL_ADDRESS
@@ -34,75 +34,51 @@ RESUME_ACTIONS = ('restart', 'heal', 'none',)
 class check:
 
     @classmethod
-    def run(self):
+    def run(self, as_json=False):
+        items = []
         problems = []
 
-        self.show('Settings', str(user_path) if user_path.exists() else 'defaults only')
+        items.append(('settings', 'Settings', str(user_path) if user_path.exists() else None))
         for key in UNKNOWN_SETTINGS:
             problems.append(f'{key} is not a setting, remove it')
 
         installed = distributions()
-        self.show('DISTRIBUTION', DISTRIBUTION)
+        items.append(('DISTRIBUTION', 'DISTRIBUTION', DISTRIBUTION))
+        items.append(('installed', 'Installed distributions', installed))
         if DISTRIBUTION not in installed:
-            problems.append((f'DISTRIBUTION {DISTRIBUTION} is not installed, '
-                             f'installed: {", ".join(installed) or "none"}'))
+            problems.append(f'DISTRIBUTION {DISTRIBUTION} is not installed')
 
-        wslconfig_mode = self.get_wslconfig_networking_mode()
-        self.show('NETWORK_MODE', f'{NETWORK_MODE} (.wslconfig networkingMode={wslconfig_mode})')
+        wslconfig_mode = wslconfig_networking_mode()
+        items.append(('NETWORK_MODE', 'NETWORK_MODE', NETWORK_MODE))
+        items.append(('wslconfig', '.wslconfig', read_wslconfig()))
+        if wslconfig_mode == 'unreadable':
+            problems.append(f'{wslconfig_path()} cannot be parsed')
         if NETWORK_MODE not in NETWORK_MODES:
             problems.append(f'NETWORK_MODE must be one of {", ".join(NETWORK_MODES)}')
         elif (NETWORK_MODE == 'mirrored') != (wslconfig_mode == 'mirrored'):
             problems.append((f'NETWORK_MODE {NETWORK_MODE} does not match '
                              f'networkingMode={wslconfig_mode} in .wslconfig'))
 
-        self.show('EXTERNAL_ADDRESS', EXTERNAL_ADDRESS)
+        items.append(('EXTERNAL_ADDRESS', 'EXTERNAL_ADDRESS', EXTERNAL_ADDRESS))
         if NETWORK_MODE == 'portproxy':
-            self.show('BINDING_ADDRESS', BINDING_ADDRESS)
+            items.append(('BINDING_ADDRESS', 'BINDING_ADDRESS', BINDING_ADDRESS))
             if BINDING_ADDRESS.split('.')[:3] == EXTERNAL_ADDRESS.split('.')[:3]:
                 problems.append(f'BINDING_ADDRESS {BINDING_ADDRESS} is inside the LAN subnet')
-            self.show('TCP forwarded to WSL', self.join(PROXY_FORWARDING_TCP_PORTS))
-            self.show('UDP relayed by wsludpservice', self.join(
-                PROXY_FORWARDING_UDP_PORTS + SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS))
-            self.show('Opened on the Windows firewall', self.join(FIREWALL_ALLOWED_PORTS))
+            items.append(('forwarded_tcp_ports', 'TCP forwarded to WSL',
+                          sorted(PROXY_FORWARDING_TCP_PORTS)))
+            items.append(('relayed_udp_ports', 'UDP relayed by wsludpservice', sorted(
+                PROXY_FORWARDING_UDP_PORTS + SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS)))
+            items.append(('firewall_ports', 'Opened on the Windows firewall',
+                          FIREWALL_ALLOWED_PORTS))
         else:
-            self.show('Opened on the Windows and Hyper-V firewalls',
-                      self.join(FIREWALL_ALLOWED_PORTS))
+            items.append(('firewall_ports', 'Opened on the Windows and Hyper-V firewalls',
+                          FIREWALL_ALLOWED_PORTS))
 
-        self.show('RESUME_ACTION', RESUME_ACTION)
+        items.append(('RESUME_ACTION', 'RESUME_ACTION', RESUME_ACTION))
         if RESUME_ACTION not in RESUME_ACTIONS:
             problems.append(f'RESUME_ACTION must be one of {", ".join(RESUME_ACTIONS)}')
-        if RESUME_PROBE_PORTS:
-            self.show('RESUME_PROBE_PORTS', self.join(RESUME_PROBE_PORTS))
+        items.append(('RESUME_PROBE_PORTS', 'RESUME_PROBE_PORTS', RESUME_PROBE_PORTS))
 
-        self.show('KEEPALIVE', KEEPALIVE)
+        items.append(('KEEPALIVE', 'KEEPALIVE', KEEPALIVE))
 
-        if not problems:
-            print(' * Nothing to fix')
-            print()
-            return 0
-
-        print(' * Problems')
-        for problem in problems:
-            print(f'   {problem}')
-        print()
-        return 1
-
-    @classmethod
-    def get_wslconfig_networking_mode(self):
-        path = Path(os.environ.get('USERPROFILE', '~')).expanduser().joinpath('.wslconfig')
-        config = configparser.ConfigParser(strict=False, inline_comment_prefixes=('#', ';',))
-        try:
-            config.read(str(path), encoding='utf-8-sig')
-        except configparser.Error:
-            return 'unreadable'
-        return config.get('wsl2', 'networkingMode', fallback='nat').strip().lower()
-
-    @classmethod
-    def join(self, ports):
-        return ','.join([str(v) for v in sorted(set(ports))]) or 'none'
-
-    @classmethod
-    def show(self, title, value):
-        print(f' * {title}')
-        print(f'   {value}')
-        print()
+        return report(items, problems, as_json)

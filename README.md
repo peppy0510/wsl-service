@@ -38,6 +38,19 @@ again and again.
    against the machine, and exits with 1 when something has to be fixed. It needs no elevation.
 6. Run `wslservice.bat` elevated. It asks for elevation itself and then applies everything.
 7. Run `wslservice-install-task.bat` elevated.
+8. Run `wslservice-status.bat` to see that it all took effect.
+
+## Status
+
+`wslservice-status.bat`, or `python.exe source/wslservice.py --status`, prints what is in effect
+right now without changing anything and without elevation: whether the distribution runs, the
+state of the tasks, what holds the distribution for `KEEPALIVE`, the ports opened on the firewalls
+or forwarded, the ports listening inside WSL, and the last resume. It exits with 1 when the
+settings have not been applied yet. When WSL is not running it does not start it, so the
+listening ports stay empty.
+
+Add `--json` to `--check` or `--status` for output that other programs can read. `--check --json`
+also carries the sections and keys of `.wslconfig`.
 
 ## How to register
 

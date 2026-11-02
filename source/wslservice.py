@@ -24,6 +24,7 @@ from libportproxy import portproxy
 from libresume import resume
 from libschtasks import schtasks
 from libshortcut import shortcut
+from libstatus import status
 from libuaccontrol import is_admin
 from libuaccontrol import run_as_admin
 from settings import ANSI_BACKGROUND_WHITE
@@ -86,6 +87,19 @@ parser.add_argument(
     '--check',
     action='store_true',
     help='print the resolved settings and check them without changing anything',
+)
+
+parser.add_argument(
+    '-s',
+    '--status',
+    action='store_true',
+    help='print what is running and what is opened right now without changing anything',
+)
+
+parser.add_argument(
+    '--json',
+    action='store_true',
+    help='print --check or --status as json',
 )
 
 parser.add_argument(
@@ -247,7 +261,9 @@ def main():
 
 if __name__ == '__main__':
     if args.check:
-        sys.exit(check.run())
+        sys.exit(check.run(args.json))
+    elif args.status:
+        sys.exit(status.run(args.json))
     elif args.initd_only or RESTART_UNELEVATED:
         main()
     else:
