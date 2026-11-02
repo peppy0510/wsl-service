@@ -1,5 +1,5 @@
 {
-    "DISTRIBUTION": "Ubuntu-24.04",
+    "DISTRIBUTION": "Ubuntu-26.04",
     // "portproxy": a static WSL address published with netsh portproxy.
     // "mirrored": networkingMode=mirrored in .wslconfig, Hyper-V firewall instead of portproxy.
     "NETWORK_MODE": "portproxy",

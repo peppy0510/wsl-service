@@ -32,7 +32,7 @@ if user_path.exists():
     user_settings = load_commented_json(str(user_path))
     settings = merge_dict(settings, user_settings)
 
-DISTRIBUTION = settings.get('DISTRIBUTION', 'Ubuntu-20.04')
+DISTRIBUTION = settings.get('DISTRIBUTION', 'Ubuntu-26.04')
 
 
 def get_routed_address():
