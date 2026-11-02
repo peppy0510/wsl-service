@@ -1,5 +1,11 @@
 # WSL Service
 
+> Maintenance only. [PyWinSystem](https://github.com/peppy0510/PyWinSystem) does all of this
+> with a window to edit the settings, `.wslconfig` and `/etc/wsl.conf`, a tray menu, and the
+> same from the command line. `PyWinSystem.exe --wsl migrate` moves your settings over and
+> removes what this tool registered; see "Coming from wsl-service" in its README. This
+> repository keeps working and gets fixes, but no new features.
+
 * Starts your WSL distribution on Windows boot, before anyone logs on.
 * Publishes WSL ports to your network and opens them on the Windows firewall.
 * Runs init commands, so a web server comes up like a Linux daemon.
