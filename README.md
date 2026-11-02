@@ -66,8 +66,15 @@ option.
 
 `wslservice-run-task.bat` runs the registered `WSLService` task on demand.
 
-`wslservice-restart.bat` shuts WSL down and starts it again through the `WSL-Boot` task, so it needs
-`KEEPALIVE`. Use it when the distribution is stuck; it has to run elevated.
+## Restarting WSL
+
+The installer also adds a `WSL Restart` shortcut to the Start menu, and the uninstaller removes it.
+`wslservice-restart.bat` does the same from the repository. Use it when the distribution is stuck.
+
+It shuts WSL down, starts `KEEPALIVE` again and runs `INITD_EXECUTES`. In `mirrored` mode the
+firewall rules survive a restart, so it runs without elevation, and `KEEPALIVE` is held by your
+logon session until the `WSL-Boot` task takes over again on the next boot. In `portproxy` mode the
+forwarding has to be written again for the new WSL address, so it asks for elevation.
 
 ## Network modes
 

@@ -9,8 +9,8 @@ email: peppy0510@hotmail.com
 
 import configparser
 import os
-import subprocess
 
+from libbase import distributions
 from pathlib import Path
 from settings import BINDING_ADDRESS
 from settings import DISTRIBUTION
@@ -24,7 +24,6 @@ from settings import RESUME_ACTION
 from settings import RESUME_PROBE_PORTS
 from settings import SOURCE_INSERTED_PROXY_FORWARDING_UDP_PORTS
 from settings import UNKNOWN_SETTINGS
-from settings import WSL_EXECUTABLE
 from settings import user_path
 
 
@@ -42,11 +41,11 @@ class check:
         for key in UNKNOWN_SETTINGS:
             problems.append(f'{key} is not a setting, remove it')
 
-        distributions = self.get_distributions()
+        installed = distributions()
         self.show('DISTRIBUTION', DISTRIBUTION)
-        if DISTRIBUTION not in distributions:
+        if DISTRIBUTION not in installed:
             problems.append((f'DISTRIBUTION {DISTRIBUTION} is not installed, '
-                             f'installed: {", ".join(distributions) or "none"}'))
+                             f'installed: {", ".join(installed) or "none"}'))
 
         wslconfig_mode = self.get_wslconfig_networking_mode()
         self.show('NETWORK_MODE', f'{NETWORK_MODE} (.wslconfig networkingMode={wslconfig_mode})')
@@ -87,18 +86,6 @@ class check:
             print(f'   {problem}')
         print()
         return 1
-
-    @classmethod
-    def get_distributions(self):
-        try:
-            proc = subprocess.run(
-                [WSL_EXECUTABLE, '-l', '-q'], stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL, timeout=30)
-        except (OSError, subprocess.SubprocessError):
-            return []
-        # wsl.exe writes UTF-16 unless WSL_UTF8 is set.
-        resp = proc.stdout.replace(b'\x00', b'').decode('utf-8', 'ignore')
-        return [v.strip() for v in resp.split('\n') if v.strip()]
 
     @classmethod
     def get_wslconfig_networking_mode(self):

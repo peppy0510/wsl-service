@@ -9,8 +9,10 @@ email: peppy0510@hotmail.com
 
 import sys
 import tempfile
+import time
 
 from libbase import execute
+from libbase import execute_code
 from libbase import powershell
 from pathlib import Path
 from settings import BOOT_TASK_NAME
@@ -136,6 +138,20 @@ class schtasks:
             file.write(xml.encode('utf-16'))
         execute(f'schtasks /Create /TN "{name}" /XML "{path}" /F', shell=True)
         path.unlink(missing_ok=True)
+
+    @classmethod
+    def run(self, name):
+        # A task that is still running ignores a new start.
+        deadline = time.time() + 30
+        while self.state(name) == 'Running' and time.time() < deadline:
+            time.sleep(0.5)
+        return execute_code(['schtasks', '/Run', '/TN', name]) == 0
+
+    @classmethod
+    def state(self, name):
+        resp = powershell((f"(Get-ScheduledTask -TaskName '{name}' "
+                           '-ErrorAction SilentlyContinue).State'), display_error=False)
+        return (resp or '').strip()
 
     @classmethod
     def delete(self, name):

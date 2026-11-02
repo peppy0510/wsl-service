@@ -22,6 +22,18 @@ def bash(script):
     return [WSL_EXECUTABLE, '-d', DISTRIBUTION, '--exec', 'bash', '-c', script]
 
 
+def distributions(running=False):
+    command = [WSL_EXECUTABLE, '--list', '--quiet'] + (['--running'] if running else [])
+    try:
+        proc = subprocess.run(
+            command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    # wsl.exe writes UTF-16 unless WSL_UTF8 is set.
+    resp = proc.stdout.replace(b'\x00', b'').decode('utf-8', 'ignore')
+    return [v.strip() for v in resp.split('\n') if v.strip()]
+
+
 def powershell(command, display_error=True):
     return execute([
         'powershell.exe', '-NoProfile', '-NonInteractive', '-Command', command],

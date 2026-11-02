@@ -13,19 +13,20 @@ import sys
 from pathlib import Path
 
 
+def is_admin():
+    try:
+        return bool(ctypes.windll.shell32.IsUserAnAdmin())
+    except Exception:
+        return False
+
+
 class run_as_admin:
 
     def __init__(self, callback):
-        if self.is_admin():
+        if is_admin():
             callback()
         else:
             file = str(Path(sys.argv[0]).resolve())
             params = ' '.join([f'"{v}"' for v in [file] + sys.argv[1:]])
             ctypes.windll.shell32.ShellExecuteW(
                 None, 'runas', sys.executable, params, None, 1)
-
-    def is_admin(self):
-        try:
-            return ctypes.windll.shell32.IsUserAnAdmin()
-        except Exception:
-            return False

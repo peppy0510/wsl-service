@@ -94,6 +94,7 @@ PROJECT_PATH = str(Path(__file__).resolve().parent.parent)
 SERVICE_TASK_NAME = 'WSLService'
 BOOT_TASK_NAME = 'WSL-Boot'
 RESUME_TASK_NAME = 'WSL-Resume'
+RESTART_SHORTCUT_NAME = 'WSL Restart'
 
 CWD = os.path.expanduser('~')
 

@@ -9,10 +9,12 @@ email: peppy0510@hotmail.com
 
 import argparse
 import asyncio
+import subprocess
 import sys
 import time
 
 from libadvfirewall import advfirewall
+from libbase import distributions
 from libbase import execute
 from libbase import shutdown
 from libcheck import check
@@ -21,14 +23,18 @@ from libinitd import initd
 from libportproxy import portproxy
 from libresume import resume
 from libschtasks import schtasks
+from libshortcut import shortcut
+from libuaccontrol import is_admin
 from libuaccontrol import run_as_admin
 from settings import ANSI_BACKGROUND_WHITE
 from settings import ANSI_RESET
 from settings import BINDING_ADDRESS
+from settings import BOOT_TASK_NAME
 from settings import BROADCAST_ADDRESS
 from settings import DISTRIBUTION
 from settings import FIREWALL_ALLOWED_PORTS
 from settings import INITD_EXECUTES
+from settings import KEEPALIVE
 from settings import NETWORK_MODE
 from settings import PROXY_FORWARDING_TCP_PORTS
 from settings import RESUME_ACTION
@@ -82,10 +88,20 @@ parser.add_argument(
     help='print the resolved settings and check them without changing anything',
 )
 
+parser.add_argument(
+    '--restart',
+    action='store_true',
+    help='restart the distribution, elevated only when the network mode needs it',
+)
+
 args = parser.parse_args()
 
+# Firewall rules survive a restart in mirrored mode, so it needs neither the network part nor
+# elevation.
+RESTART_UNELEVATED = args.restart and NETWORK_MODE == 'mirrored'
+
 ENABLE_INITD = False if args.network_only else ENABLE_INITD
-ENABLE_NETWORK = False if args.initd_only else ENABLE_NETWORK
+ENABLE_NETWORK = False if args.initd_only or RESTART_UNELEVATED else ENABLE_NETWORK
 
 
 def setup_network_inside_wsl():
@@ -110,18 +126,49 @@ def launch_dbus_wsl():
              f'--exec dbus-launch true'), display_error=False)
 
 
+def stop_distribution():
+    shutdown()
+    deadline = time.time() + 30
+    while DISTRIBUTION in distributions(running=True) and time.time() < deadline:
+        time.sleep(0.5)
+
+
+def start_keepalive():
+    if not KEEPALIVE:
+        return
+    if is_admin() and schtasks.run(BOOT_TASK_NAME):
+        return
+    # Without elevation the boot task cannot be started, so this logon session holds the
+    # distribution until the task takes over again on the next boot.
+    subprocess.Popen(
+        ['conhost.exe', '--headless', WSL_EXECUTABLE, '-d', DISTRIBUTION, '-u', 'root',
+         '--', 'sleep', 'infinity'],
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
+        close_fds=True)
+
+
 async def aiomain():
     if args.uninstall_task:
         schtasks.uninstall()
+        shortcut.remove()
         schtasks.showall()
+        shortcut.show()
         return
 
     if args.install_task:
         schtasks.install()
+        shortcut.create()
         schtasks.showall()
+        shortcut.show()
         return
 
     restart = NETWORK_MODE != 'mirrored'
+
+    if args.restart:
+        stop_distribution()
+        start_keepalive()
+        restart = False
 
     if args.resume:
         if RESUME_ACTION == 'none':
@@ -185,6 +232,12 @@ async def aiomain():
         print()
         time.sleep(1)
 
+    if args.restart:
+        print(' * DISTRIBUTIONS Running')
+        print(f'   {", ".join(distributions(running=True)) or "none"}')
+        print()
+        time.sleep(3)
+
 
 def main():
     loop = asyncio.new_event_loop()
@@ -195,7 +248,7 @@ def main():
 if __name__ == '__main__':
     if args.check:
         sys.exit(check.run())
-    elif args.initd_only:
+    elif args.initd_only or RESTART_UNELEVATED:
         main()
     else:
         run_as_admin(main)
